@@ -391,6 +391,15 @@ function showMain(idx) {
     document.getElementById('mt' + i).className = 'tab' + (i === idx ? ' on' : '');
     document.getElementById('mb' + i).style.display = i === idx ? 'block' : 'none';
   }
+  if (idx === 1) {
+    renderPostSubBody(0);
+    renderPostSubBody(1);
+    renderLevelList('bypass');
+    showPostSub(0);
+  }
+  if (idx === 2) {
+    renderLevelList('mod');
+  }
 }
 
 function showPostSub(idx) {
