@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FranBuzz Post Approval — Approver Workflow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; padding: 24px; }
+.stage-nav { display: flex; gap: 0; margin-bottom: 20px; border: 0.5px solid #e0ded8; border-radius: 10px; overflow: hidden; max-width: 600px; margin-left: auto; margin-right: auto; }
+.stage-btn { flex: 1; padding: 9px 8px; font-size: 11px; color: #888780; cursor: pointer; background: #f5f4f0; border: none; text-align: center; border-right: 0.5px solid #e0ded8; line-height: 1.4; }
+.stage-btn:last-child { border-right: none; }
+.stage-btn.on { background: #fff; color: #111; font-weight: 500; }
+.stage { display: none; }
+.stage.on { display: flex; flex-direction: column; align-items: center; }
+.phone-frame { width: 300px; background: #1a1a1a; border-radius: 36px; padding: 10px; }
+.phone-screen { background: #fff; border-radius: 28px; overflow: hidden; position: relative; min-height: 560px; }
+.ph-status { background: #fff; padding: 10px 18px 4px; display: flex; justify-content: space-between; }
+.ph-status span { font-size: 11px; font-weight: 500; color: #111; }
+.notif-bar { background: #f5f5f5; padding: 10px 12px; }
+.notif-card { background: white; border-radius: 10px; padding: 10px 12px; }
+.notif-hdr { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.notif-icon { width: 18px; height: 18px; border-radius: 4px; background: #185FA5; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; flex-shrink: 0; }
+.notif-app { font-size: 10px; font-weight: 500; color: #666; }
+.notif-time { font-size: 10px; color: #999; margin-left: auto; }
+.notif-title { font-size: 12px; font-weight: 500; color: #111; margin-bottom: 2px; }
+.notif-body { font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 8px; }
+.notif-acts { display: flex; gap: 6px; border-top: 0.5px solid #eee; padding-top: 8px; }
+.nab { flex: 1; text-align: center; font-size: 11px; font-weight: 500; padding: 6px 0; border-radius: 6px; cursor: pointer; }
+.nab.view { background: #E6F1FB; color: #0C447C; }
+.nab.app { background: #E1F5EE; color: #0F6E56; }
+.nab.rej { background: #FCEBEB; color: #A32D2D; }
+.platform-wrap { background: #f5f4f0; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 600px; }
+.platform-header { background: #1a2540; border-radius: 10px 10px 0 0; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+.platform-logo { font-size: 13px; font-weight: 500; color: white; }
+.platform-nav-right { display: flex; align-items: center; gap: 12px; }
+.frannie-btn { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 10px; font-size: 11px; color: white; }
+.bell-wrap { position: relative; cursor: pointer; }
+.bell-badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; background: #E24B4A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: white; font-weight: 500; }
+.notif-dropdown { background: white; border: 0.5px solid #e0e0e0; border-radius: 10px; overflow: hidden; }
+.notif-dropdown-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 0.5px solid #eee; }
+.notif-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 0.5px solid #f5f5f5; cursor: pointer; background: #f0f7ff; }
+.notif-row:hover { background: #e6f1fb; }
+.notif-row-icon { width: 32px; height: 32px; border-radius: 8px; background: #185FA5; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; flex-shrink: 0; }
+.notif-row-title { font-size: 13px; color: #185FA5; font-weight: 500; line-height: 1.4; }
+.notif-row-time { font-size: 11px; color: #999; margin-top: 2px; }
+.notif-unread { width: 8px; height: 8px; border-radius: 50%; background: #0066cc; flex-shrink: 0; margin-top: 4px; }
+.view-all { text-align: center; padding: 10px; font-size: 13px; color: #0066cc; cursor: pointer; }
+.email-wrap { width: 100%; max-width: 600px; }
+.email-frame { background: white; border: 0.5px solid #e0ded8; border-radius: 10px; overflow: hidden; }
+.email-toolbar { padding: 10px 16px; display: flex; justify-content: flex-end; gap: 8px; border-bottom: 0.5px solid #eee; }
+.email-tool-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid #ddd; border-radius: 6px; cursor: pointer; background: white; color: #555; }
+.email-header-bar { padding: 16px 20px 0; }
+.email-subject { font-size: 16px; font-weight: 500; color: #111; margin-bottom: 12px; }
+.email-from { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 0.5px solid #eee; }
+.email-from-av { width: 36px; height: 36px; border-radius: 50%; background: #E6F1FB; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #185FA5; flex-shrink: 0; }
+.email-body { padding: 16px 20px; }
+.email-banner { background: #185FA5; padding: 16px 20px; text-align: center; margin-bottom: 16px; border-radius: 6px; }
+.email-banner-title { font-size: 14px; font-weight: 500; color: white; margin-bottom: 4px; }
+.email-banner-sub { font-size: 12px; color: rgba(255,255,255,0.8); }
+.email-section-label { font-size: 11px; font-weight: 500; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.email-content-box { background: #f9f9f9; border: 0.5px solid #eee; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 13px; color: #333; line-height: 1.55; }
+.email-poster-box { background: #f0f7ff; border: 0.5px solid #B5D4F4; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+.email-poster-name { font-size: 13px; font-weight: 500; color: #0C447C; margin-bottom: 4px; }
+.email-poster-meta { font-size: 12px; color: #555; display: flex; flex-direction: column; gap: 2px; }
+.email-cta-single { width: 100%; padding: 12px 0; text-align: center; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; background: #185FA5; color: white; margin-bottom: 10px; display: block; border: none; }
+.email-login-note { font-size: 12px; color: #999; text-align: center; margin-bottom: 16px; }
+.email-footer { font-size: 11px; color: #999; text-align: center; border-top: 0.5px solid #eee; padding: 12px 20px; }
+.review-screen { background: #fff; }
+.review-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid #eee; }
+.review-back { font-size: 20px; color: #555; cursor: pointer; }
+.review-title { font-size: 14px; font-weight: 500; color: #111; flex: 1; }
+.review-body { padding: 14px; max-height: 400px; overflow-y: auto; }
+.poster-card { display: flex; align-items: flex-start; gap: 10px; background: #f0f7ff; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.poster-av { width: 36px; height: 36px; border-radius: 50%; background: #FAEEDA; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #633806; flex-shrink: 0; }
+.poster-name { font-size: 13px; font-weight: 500; color: #111; }
+.poster-meta { font-size: 11px; color: #666; display: flex; flex-direction: column; gap: 1px; margin-top: 2px; }
+.post-preview { background: #f9f9f9; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+.post-preview-img { width: 100%; height: 90px; background: #c8d8e8; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 11px; margin-top: 8px; }
+.post-submitted { font-size: 11px; color: #999; margin-bottom: 14px; }
+.review-actions { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-top: 0.5px solid #eee; background: #fff; }
+.review-btn { width: 100%; padding: 11px 0; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; border: none; }
+.review-btn.open { background: #1D9E75; color: white; }
+.review-btn.moderate { background: #E6F1FB; color: #0C447C; border: 0.5px solid #B5D4F4; }
+.review-btn.reject { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #F09595; }
+.reject-panel { padding: 12px 14px; background: #fff; border-top: 0.5px solid #eee; }
+.reject-label { font-size: 12px; font-weight: 500; color: #333; margin-bottom: 6px; }
+.reject-input { width: 100%; font-size: 12px; padding: 8px 10px; border: 0.5px solid #ddd; border-radius: 8px; color: #333; outline: none; resize: none; min-height: 60px; background: #f9f9f9; }
+.reject-confirm { width: 100%; margin-top: 8px; padding: 10px; background: #E24B4A; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.hint { margin-top: 12px; font-size: 12px; color: #888780; text-align: center; max-width: 400px; }
+</style>
+</head>
+<body>
+<div class="stage-nav">
+  <button class="stage-btn on" onclick="showStage(0)">1 · Push notification</button>
+  <button class="stage-btn" onclick="showStage(1)">2 · Platform badge</button>
+  <button class="stage-btn" onclick="showStage(2)">3 · Email</button>
+  <button class="stage-btn" onclick="showStage(3)">4 · Review screen</button>
+</div>
+
+<!-- STAGE 0: Push -->
+<div class="stage on" id="stage0">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="notif-bar" style="padding:16px 12px;">
+        <div style="font-size:11px;color:#999;margin-bottom:8px;text-align:center;">Wednesday, 7 May</div>
+        <div class="notif-card">
+          <div class="notif-hdr"><div class="notif-icon"></div><span class="notif-app">FC Sky · FranBuzz</span><span class="notif-time">now</span></div>
+          <div class="notif-title">Post pending your approval</div>
+          <div class="notif-body">Sarah Kim submitted a wall post — tap to review before it goes live.</div>
+          <div class="notif-acts">
+            <div class="nab view" style="flex:none;width:100%;" onclick="showStage(3)">View post</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:20px 16px;text-align:center;">
+        <div style="font-size:28px;color:#ddd;margin-bottom:8px;"></div>
+        <div style="font-size:12px;color:#aaa;">Swipe up to unlock</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Lock screen — tap "View post" to open the full review screen and action</div>
+</div>
+
+<!-- STAGE 1: Platform badge -->
+<div class="stage" id="stage1">
+  <div class="platform-wrap">
+    <div class="platform-header">
+      <div class="platform-logo">&#9632; FranConnect</div>
+      <div class="platform-nav-right">
+        <div class="frannie-btn">Frannie AI</div>
+        <div class="bell-wrap" onclick="toggleDrop()">
+          <span style="font-size:20px;color:white;"></span>
+          <div class="bell-badge" id="bellBadge">1</div>
+        </div>
+        <span style="font-size:20px;color:white;">&#9881;</span>
+        <div style="width:28px;height:28px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:white;">JH</div>
+      </div>
+    </div>
+    <div class="notif-dropdown" id="notifDrop" style="display:none;">
+      <div class="notif-dropdown-header">
+        <span style="font-size:13px;font-weight:500;color:#111;">Notifications</span>
+        <span style="font-size:16px;color:#999;">&#9881;</span>
+      </div>
+      <div class="notif-row" onclick="showStage(3)">
+        <div class="notif-unread"></div>
+        <div class="notif-row-icon"></div>
+        <div>
+          <div class="notif-row-title">New post in FranBuzz by Sarah Kim — pending your approval</div>
+          <div class="notif-row-time">May 7, 2026, 12:40 PM</div>
+        </div>
+      </div>
+      <div class="view-all">View All</div>
+    </div>
+    <div style="padding:24px;text-align:center;font-size:13px;color:#888780;">Click the bell icon to see the notification</div>
+  </div>
+  <div class="hint">Platform bell badge — click to expand, tap notification to open the review screen</div>
+</div>
+
+<!-- STAGE 2: Email -->
+<div class="stage" id="stage2">
+  <div class="email-wrap">
+    <div class="email-frame">
+      <div class="email-toolbar">
+        <button class="email-tool-btn">&#8617; Reply</button>
+        <button class="email-tool-btn">&#8618; Forward</button>
+      </div>
+      <div class="email-header-bar">
+        <div class="email-subject">FranBuzz — Post pending your approval</div>
+        <div class="email-from">
+          <div class="email-from-av">FC</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#111;">FranConnect · FranBuzz</div>
+            <div style="font-size:12px;color:#999;">noreply@franconnect.com → James Hinks</div>
+          </div>
+          <div style="margin-left:auto;font-size:11px;color:#999;">Wed 7 May, 12:40 PM</div>
+        </div>
+      </div>
+      <div class="email-body">
+        <div class="email-banner">
+          <div class="email-banner-title">A post is waiting for your approval</div>
+          <div class="email-banner-sub">Review it before it goes live in FranBuzz</div>
+        </div>
+        <div class="email-section-label">Posted by</div>
+        <div class="email-poster-box">
+          <div class="email-poster-name">Sarah Kim</div>
+          <div class="email-poster-meta">
+            <span>Franchise Owner · Burgerfuel</span>
+            <span>Auckland, NZ · Location 14</span>
+            <span>&#9203; Submitted Wed 7 May, 12:38 PM</span>
+          </div>
+        </div>
+        <div class="email-section-label">Post content</div>
+        <div class="email-content-box">Had a very productive managers meeting — discussed the new menu items and plans for the week ahead. Pre-shifts and training all locked in. #TakaOnTop #OnTheSamePage</div>
+        <button class="email-cta-single">Review and action this post &#8594;</button>
+        <div class="email-login-note"> You may be asked to log in to FranConnect to complete your review</div>
+        <div class="email-footer">This notification was sent because you are a configured moderator for FranBuzz.<br>FranConnect · Hub · FranBuzz</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Single CTA — links to the review screen in platform. Login required if session has expired.</div>
+</div>
+
+<!-- STAGE 3: Review screen -->
+<div class="stage" id="stage3">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="review-screen">
+        <div class="review-header">
+          <span class="review-back">&#8592;</span>
+          <span class="review-title">Review post</span>
+          <span style="font-size:11px;color:#999;">1 pending</span>
+        </div>
+        <div class="review-body">
+          <div class="post-submitted">&#9203; Submitted Wed 7 May, 12:38 PM · Wall post</div>
+          <div class="poster-card">
+            <div class="poster-av">SK</div>
+            <div>
+              <div class="poster-name">Sarah Kim</div>
+              <div class="poster-meta">
+                <span>Franchise Owner · Burgerfuel</span>
+                <span>Auckland, NZ · Location 14</span>
+                <span>Bite Club NZ · Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="post-preview">
+            <div style="font-size:12px;color:#333;line-height:1.55;margin-bottom:8px;">Had a very productive managers meeting — discussed the new menu items and plans for the week ahead. Pre-shifts and training all locked in. #TakaOnTop #OnTheSamePage</div>
+            <div class="post-preview-img"> Team photo</div>
+          </div>
+          <div id="rejectPanel" style="display:none;">
+            <div class="reject-panel">
+              <div class="reject-label">Reason for rejection (visible to poster)</div>
+              <textarea class="reject-input" id="rejectReason" placeholder="e.g. Please remove the pricing reference before resubmitting..."></textarea>
+              <button class="reject-confirm" onclick="confirmReject()">Confirm rejection</button>
+            </div>
+          </div>
+        </div>
+        <div class="review-actions" id="reviewActions">
+          <button class="review-btn open" onclick="confirmApprove('open')">&#10003; Approve &amp; open comments</button>
+          <button class="review-btn moderate" onclick="confirmApprove('moderate')">&#10003; Approve &amp; moderate comments</button>
+          <button class="review-btn reject" onclick="showRejectPanel()">&#215; Reject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Tap Approve to set comment handling for this post before confirming. Tap Reject to enter a reason.</div>
+</div>
+
+<script>
+function showStage(idx) {
+  var btns = document.querySelectorAll('.stage-btn');
+  for (var i = 0; i < 4; i++) {
+    document.getElementById('stage' + i).style.display = 'none';
+    document.getElementById('stage' + i).className = 'stage';
+    btns[i].className = 'stage-btn';
+  }
+  document.getElementById('stage' + idx).style.display = 'flex';
+  document.getElementById('stage' + idx).className = 'stage on';
+  btns[idx].className = 'stage-btn on';
+}
+
+function toggleDrop() {
+  var d = document.getElementById('notifDrop');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('bellBadge').style.display = 'none';
+}
+
+function showRejectPanel() {
+  document.getElementById('rejectPanel').style.display = 'block';
+  document.getElementById('reviewActions').style.display = 'none';
+}
+
+function confirmReject() {
+  document.getElementById('rejectPanel').innerHTML = '<div style="padding:12px 14px;background:#FCEBEB;border-radius:8px;font-size:12px;color:#791F1F;">&#10003; Rejection sent &mdash; poster has been notified</div>';
+}
+
+function confirmApprove(mode) {
+  var msg = mode === 'moderate'
+    ? '&#10003; Approved &mdash; comments on this post will be moderated.'
+    : '&#10003; Approved &mdash; post is live and comments are open.';
+  var bg = '#E1F5EE';
+  var col = '#0F6E56';
+  document.getElementById('reviewActions').innerHTML = '<div style="width:100%;padding:12px;background:' + bg + ';border-radius:8px;font-size:12px;font-weight:500;color:' + col + ';text-align:center;">' + msg + '</div>';
+}
+</script>
+</body>
+</html>

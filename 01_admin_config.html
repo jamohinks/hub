@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FranBuzz — Configure Moderation and Approvals</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; padding: 24px; }
+.frame { background: #fff; border: 0.5px solid #e0ded8; border-radius: 12px; overflow: hidden; max-width: 860px; margin: 0 auto; }
+.bc { font-size: 12px; color: #888780; padding: 10px 16px; border-bottom: 0.5px solid #ebebeb; }
+.bc a { color: #185FA5; text-decoration: none; }
+.tabs { display: flex; border-bottom: 0.5px solid #ebebeb; background: #f5f4f0; overflow-x: auto; }
+.tab { padding: 10px 14px; font-size: 12px; color: #888780; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; white-space: nowrap; flex-shrink: 0; }
+.tab.on { background: #fff; color: #111; border-bottom: 2px solid #185FA5; font-weight: 500; }
+.tab:hover { background: #fff; }
+.body { padding: 20px; min-height: 400px; }
+.stitle { font-size: 12px; font-weight: 500; color: #111; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 0.5px solid #ebebeb; }
+.desc { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.55; }
+.slabel { font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; }
+.kw-note { background: #f5f4f0; border-left: 3px solid #185FA5; padding: 10px 14px; font-size: 12px; color: #666; margin-bottom: 16px; line-height: 1.55; }
+.kw-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.kw-panel { border: 0.5px solid #ebebeb; border-radius: 10px; overflow: hidden; }
+.kw-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f5f4f0; border-bottom: 0.5px solid #ebebeb; }
+.kw-title { font-size: 12px; font-weight: 500; color: #111; }
+.kw-toggle { display: flex; align-items: center; gap: 6px; }
+.tog { position: relative; width: 30px; height: 17px; flex-shrink: 0; }
+.tog input { opacity: 0; width: 0; height: 0; }
+.tsl { position: absolute; inset: 0; background: #B4B2A9; border-radius: 17px; cursor: pointer; transition: background 0.2s; }
+.tsl:before { content:''; position:absolute; width:11px; height:11px; left:3px; top:3px; background:white; border-radius:50%; transition:transform 0.2s; }
+.tog input:checked + .tsl { background: #1D9E75; }
+.tog input:checked + .tsl:before { transform: translateX(13px); }
+.kw-toolbar { display: flex; gap: 6px; padding: 8px 10px; border-bottom: 0.5px solid #ebebeb; }
+.kw-btn { font-size: 11px; padding: 4px 8px; border-radius: 6px; cursor: pointer; border: 0.5px solid #ddd; background: #fff; color: #666; }
+.kw-btn:hover { background: #f5f4f0; }
+.kw-btn.danger { color: #A32D2D; border-color: #F09595; }
+.kw-list { height: 160px; overflow-y: auto; padding: 6px; }
+.kw-item { padding: 4px 6px; border-radius: 6px; font-size: 12px; color: #666; cursor: pointer; }
+.kw-item:hover { background: #f5f4f0; }
+.kw-item.sel { background: #E6F1FB; color: #0C447C; }
+.kw-add { display: flex; gap: 6px; padding: 8px 10px; border-top: 0.5px solid #ebebeb; }
+.kw-add input { flex: 1; font-size: 12px; padding: 5px 8px; border: 0.5px solid #ddd; border-radius: 6px; background: #fff; color: #111; outline: none; min-width: 0; }
+.kw-add-btn { font-size: 11px; padding: 5px 10px; background: #185FA5; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.lv-list { display: flex; flex-direction: column; border: 0.5px solid #ebebeb; border-radius: 10px; overflow: hidden; }
+.lv-row { border-bottom: 0.5px solid #ebebeb; }
+.lv-row:last-child { border-bottom: none; }
+.lv-hdr { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #fff; }
+.lv-icon { font-size: 15px; color: #888780; flex-shrink: 0; }
+.lv-icon.act { color: #185FA5; }
+.lv-name { font-size: 13px; font-weight: 500; color: #111; flex: 1; }
+.lv-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; flex-shrink: 0; }
+.b-all { background: #E1F5EE; color: #085041; }
+.b-sel { background: #E6F1FB; color: #0C447C; }
+.b-off { background: #F1EFE8; color: #5F5E5A; }
+.lv-tog { display: flex; border: 0.5px solid #ebebeb; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+.lv-opt { font-size: 11px; padding: 4px 10px; cursor: pointer; background: #f5f4f0; color: #888780; border: none; outline: none; }
+.lv-opt.on { background: #185FA5; color: white; }
+.chev { font-size: 18px; color: #888780; cursor: pointer; flex-shrink: 0; display: inline-block; transition: transform 0.2s; }
+.chev.open { transform: rotate(180deg); }
+.lv-exp { padding: 4px 14px 14px; background: #f5f4f0; }
+.sb { display: flex; align-items: center; gap: 8px; border: 0.5px solid #ddd; border-radius: 6px; padding: 7px 10px; margin-bottom: 8px; background: #fff; }
+.sb input { border: none; background: none; font-size: 13px; color: #111; outline: none; flex: 1; min-width: 0; }
+.ul { display: flex; flex-direction: column; gap: 2px; max-height: 160px; overflow-y: auto; }
+.ui { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.ui:hover { background: #fff; }
+.ui.chk { background: #E6F1FB; }
+.uav { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.uin { flex: 1; min-width: 0; }
+.unm { font-size: 13px; color: #111; font-weight: 500; }
+.umt { display: flex; flex-wrap: wrap; gap: 3px 10px; margin-top: 3px; font-size: 11px; color: #888780; }
+.ubd { display: flex; gap: 4px; margin-top: 4px; }
+.uba { font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 500; }
+.ba-t { background: #E1F5EE; color: #085041; }
+.ba-g { background: #F1EFE8; color: #5F5E5A; }
+.uck { width: 16px; height: 16px; border-radius: 4px; border: 0.5px solid #ddd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; margin-top: 7px; }
+.uck.on { background: #185FA5; border-color: #185FA5; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; border-radius: 20px; padding: 3px 8px; background: #E6F1FB; border: 0.5px solid #B5D4F4; color: #0C447C; }
+.pill-av { width: 16px; height: 16px; border-radius: 50%; background: #B5D4F4; color: #0C447C; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 500; flex-shrink: 0; }
+.pill-x { font-size: 13px; cursor: pointer; margin-left: 2px; }
+.notif-row { display: flex; gap: 16px; margin-top: 4px; }
+.notif-opt { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; cursor: pointer; }
+.subtabs { display: flex; margin-bottom: 16px; border: 0.5px solid #ebebeb; border-radius: 6px; overflow: hidden; width: fit-content; }
+.stab { padding: 7px 16px; font-size: 12px; color: #888780; cursor: pointer; background: #f5f4f0; border: none; }
+.stab.on { background: #fff; color: #111; font-weight: 500; }
+.tog-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid #ebebeb; margin-bottom: 14px; }
+.tl { font-size: 13px; color: #111; font-weight: 500; }
+.ts { font-size: 12px; color: #666; margin-top: 2px; }
+.app-sec { transition: opacity 0.2s; }
+.info-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f5f4f0; border-radius: 6px; border: 0.5px solid #ebebeb; font-size: 13px; color: #666; }
+.save-row { display: flex; gap: 8px; margin-top: 20px; }
+.save-btn { font-size: 13px; padding: 7px 20px; background: #185FA5; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.cancel-btn { font-size: 13px; padding: 7px 16px; color: #666; border: 0.5px solid #ddd; border-radius: 6px; cursor: pointer; background: #fff; }
+.new-tag { font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="bc"><a href="#">Admin</a> &rsaquo; <a href="#">Hub</a> &rsaquo; <span style="color:#111;">Configure FranBuzz Moderation &amp; Approvals</span></div>
+  <div class="tabs">
+    <div class="tab on" id="mt0" onclick="showMain(0)">Offensive / Watch / Great Keywords</div>
+    <div class="tab" id="mt1" onclick="showMain(1)">Post Approval <span class="new-tag">New</span></div>
+    <div class="tab" id="mt2" onclick="showMain(2)">Moderators</div>
+  </div>
+
+  <div class="body" id="mb0">
+    <div class="stitle">Configure keywords for Forum and FranBuzz</div>
+    <div class="kw-note">When a post contains a matching keyword, an automated notification is sent to configured Moderators. Posts go live immediately &mdash; for pre-publish control use the Post Approval tab.</div>
+    <div class="kw-grid" id="kwGrid"></div>
+    <div class="save-row"><button class="save-btn">Save</button><button class="cancel-btn">Cancel</button></div>
+  </div>
+
+  <div class="body" id="mb1" style="display:none;">
+    <div class="stitle">Post approval settings</div>
+    <div class="subtabs">
+      <button class="stab on" id="ps0" onclick="showPostSub(0)">Wall posts</button>
+      <button class="stab" id="ps1" onclick="showPostSub(1)">Team posts</button>
+    </div>
+    <div id="pb0"></div>
+    <div id="pb1" style="display:none;"></div>
+    <div style="margin-top:24px;padding-top:16px;border-top:0.5px solid #ebebeb;">
+      <div style="font-size:13px;font-weight:500;color:#111;margin-bottom:4px;">Approval bypass</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px;">Roles that post directly to the feed &mdash; no approval required regardless of settings above.</div>
+      <div class="lv-list" id="bypassList"></div>
+    </div>
+    <div class="save-row"><button class="save-btn">Save</button><button class="cancel-btn">Cancel</button></div>
+  </div>
+
+  <div class="body" id="mb2" style="display:none;">
+    <div class="stitle">Moderators</div>
+    <div class="desc">Moderators receive keyword alerts and post approval requests. Configure by hierarchy level.</div>
+    <div class="slabel">Add by hierarchy level</div>
+    <div class="lv-list" id="modList"></div>
+    <div style="margin-top:20px;padding-top:16px;border-top:0.5px solid #ebebeb;">
+      <div class="slabel">Notification preferences</div>
+      <div class="notif-row">
+        <label class="notif-opt"><input type="checkbox" checked> App notification</label>
+        <label class="notif-opt"><input type="checkbox" checked> Email</label>
+      </div>
+    </div>
+    <div class="save-row"><button class="save-btn">Save</button><button class="cancel-btn">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+var kwData = {
+  offensive: { label: 'Offensive keywords', enabled: true, words: ['ahole','anus','ass','asshole','assholes','dumbass','idiot','moron','screw you','trash'] },
+  watch:     { label: 'Watch keywords',     enabled: true, words: ['competitor','lawsuit','refund','cancel','complaint','issue','problem'] },
+  great:     { label: 'Great keywords',     enabled: true, words: ['Adorable','Amazing','Awesome','Beautiful','Brilliant','Cool','Dashing','Delightful','Fantastic','Great'] }
+};
+var kwSel = { offensive: [], watch: [], great: [] };
+
+function renderKw() {
+  var html = '';
+  var keys = ['offensive','watch','great'];
+  for (var ki = 0; ki < keys.length; ki++) {
+    var key = keys[ki];
+    var d = kwData[key];
+    var itemsHtml = '';
+    for (var wi = 0; wi < d.words.length; wi++) {
+      var w = d.words[wi];
+      var isSel = kwSel[key].indexOf(w) !== -1;
+      itemsHtml += '<div class="kw-item' + (isSel ? ' sel' : '') + '" onclick="kwToggle(\'' + key + '\',\'' + w.replace(/'/g,"\\'") + '\')">' + w + '</div>';
+    }
+    html += '<div class="kw-panel">' +
+      '<div class="kw-header"><span class="kw-title">' + d.label + '</span>' +
+      '<div class="kw-toggle"><label class="tog"><input type="checkbox"' + (d.enabled ? ' checked' : '') + ' onchange="kwToggleEnabled(\'' + key + '\',this.checked)"><span class="tsl"></span></label>' +
+      '<span style="font-size:11px;color:#888780;">' + (d.enabled ? 'On' : 'Off') + '</span></div></div>' +
+      '<div class="kw-toolbar"><button class="kw-btn" onclick="kwModify(\'' + key + '\')">Modify</button><button class="kw-btn danger" onclick="kwRemove(\'' + key + '\')">Remove</button></div>' +
+      '<div class="kw-list" id="kwl-' + key + '">' + itemsHtml + '</div>' +
+      '<div class="kw-add"><input type="text" id="kwi-' + key + '" placeholder="Add keyword..." onkeydown="if(event.key===\'Enter\')kwAdd(\'' + key + '\')"><button class="kw-add-btn" onclick="kwAdd(\'' + key + '\')">Add</button></div>' +
+      '</div>';
+  }
+  document.getElementById('kwGrid').innerHTML = html;
+}
+
+function kwToggleEnabled(key, val) { kwData[key].enabled = val; renderKw(); }
+function kwToggle(key, word) {
+  var idx = kwSel[key].indexOf(word);
+  if (idx === -1) kwSel[key].push(word); else kwSel[key].splice(idx, 1);
+  renderKw();
+}
+function kwRemove(key) {
+  for (var i = 0; i < kwSel[key].length; i++) {
+    var idx = kwData[key].words.indexOf(kwSel[key][i]);
+    if (idx !== -1) kwData[key].words.splice(idx, 1);
+  }
+  kwSel[key] = [];
+  renderKw();
+}
+function kwModify(key) {
+  if (kwSel[key].length !== 1) { alert('Select exactly one keyword to modify.'); return; }
+  var old = kwSel[key][0];
+  var nw = prompt('Modify keyword:', old);
+  if (nw && nw.trim()) {
+    var idx = kwData[key].words.indexOf(old);
+    if (idx !== -1) kwData[key].words[idx] = nw.trim();
+    kwSel[key] = [];
+    renderKw();
+  }
+}
+function kwAdd(key) {
+  var inp = document.getElementById('kwi-' + key);
+  var val = inp.value.trim();
+  if (!val) return;
+  if (kwData[key].words.indexOf(val) === -1) kwData[key].words.push(val);
+  inp.value = '';
+  renderKw();
+}
+
+var allUsers = {
+  corp: [
+    { i:'JH', n:'James Hinks',    r:'Admin',              f:'FranConnect HQ',         l:'Sydney, AU',               s:'Active',   bg:'#E6F1FB', c:'#0C447C' },
+    { i:'UA', n:'Udai Agarwal',    r:'Dev Manager',        f:'FranConnect HQ',         l:'Delhi, IN',                s:'Active',   bg:'#E6F1FB', c:'#0C447C' },
+    { i:'MK', n:'Mark King',       r:'CPO',                f:'FranConnect HQ',         l:'Dallas, TX',               s:'Active',   bg:'#E6F1FB', c:'#0C447C' }
+  ],
+  div: [
+    { i:'MR', n:'Mark Roberts',    r:'VP Operations',      f:'NutrishopUSA',           l:'Las Vegas, NV',            s:'Active',   bg:'#E1F5EE', c:'#085041' },
+    { i:'JL', n:'Jenny Liu',       r:'Divisional Manager', f:'NutrishopUSA',           l:'Phoenix, AZ',              s:'Active',   bg:'#E1F5EE', c:'#085041' },
+    { i:'TP', n:'Tom Patel',       r:'Divisional Manager', f:'Office Pride',           l:'Birmingham, AL',           s:'Active',   bg:'#E1F5EE', c:'#085041' }
+  ],
+  reg: [
+    { i:'AK', n:'Ahson Kazi',      r:'Regional Manager',   f:'NutrishopUSA',           l:'Los Angeles, CA',          s:'Active',   bg:'#F5EDE8', c:'#5F3010' },
+    { i:'AM', n:'Alex Morgan',     r:'Regional Manager',   f:'Office Pride',           l:'Atlanta, GA',              s:'Active',   bg:'#F5EDE8', c:'#5F3010' },
+    { i:'RB', n:'Rachel Brown',    r:'Area Manager',       f:'Tint World',             l:'Miami, FL',                s:'Active',   bg:'#F5EDE8', c:'#5F3010' }
+  ],
+  fra: [
+    { i:'SK', n:'Sarah Kim',       r:'Franchise Owner',    f:'Burgerfuel - Bite Club NZ', l:'Auckland, NZ - Location 14', s:'Active',   bg:'#FAEEDA', c:'#633806' },
+    { i:'AB', n:'Alice Bronowski', r:'Store Manager',      f:'NutrishopUSA - Store 42',   l:'San Diego, CA - Location 42',s:'Active',  bg:'#FAEEDA', c:'#633806' },
+    { i:'DP', n:'David Park',      r:'Franchise Owner',    f:'Office Pride - Portland',   l:'Portland, OR - Location 17', s:'Active',  bg:'#FAEEDA', c:'#633806' },
+    { i:'LT', n:'Lisa Torres',     r:'Store Manager',      f:'Tint World - Tampa',        l:'Tampa, FL - Location 8',     s:'Inactive',bg:'#FAEEDA', c:'#633806' }
+  ]
+};
+var levels = [
+  { id:'corp', label:'Corporate',   icon:'' },
+  { id:'div',  label:'Divisional',  icon:'' },
+  { id:'reg',  label:'Regional',    icon:'' },
+  { id:'fra',  label:'Franchisee',  icon:'' }
+];
+
+function mkState(defaults) {
+  var s = { corp:{mode:'off',expanded:false,sel:[]}, div:{mode:'off',expanded:false,sel:[]}, reg:{mode:'off',expanded:false,sel:[]}, fra:{mode:'off',expanded:false,sel:[]} };
+  if (defaults) { var ks = Object.keys(defaults); for (var i=0;i<ks.length;i++) s[ks[i]].mode = defaults[ks[i]]; }
+  return s;
+}
+var stMod    = mkState({corp:'all'});
+var stWall   = mkState({fra:'all'});
+var stTeam   = mkState({fra:'all'});
+var stBypass = mkState({corp:'all'});
+
+function getState(prefix) {
+  if (prefix==='mod')    return stMod;
+  if (prefix==='wall')   return stWall;
+  if (prefix==='team')   return stTeam;
+  if (prefix==='bypass') return stBypass;
+}
+function getContainer(prefix) {
+  if (prefix==='mod')    return 'modList';
+  if (prefix==='wall')   return 'wallScopeList';
+  if (prefix==='team')   return 'teamScopeList';
+  if (prefix==='bypass') return 'bypassList';
+}
+
+function renderLevelList(prefix) {
+  var st = getState(prefix);
+  var cid = getContainer(prefix);
+  var list = document.getElementById(cid);
+  if (!list) return;
+  list.innerHTML = '';
+  for (var li = 0; li < levels.length; li++) {
+    var lvl = levels[li];
+    var s = st[lvl.id];
+    var bc = 'b-off', bt = 'Off';
+    if (s.mode === 'all') { bc = 'b-all'; bt = 'All'; }
+    else if (s.mode === 'sel') { bc = s.sel.length > 0 ? 'b-sel' : 'b-off'; bt = s.sel.length + ' selected'; }
+
+    var exHtml = '';
+    if (s.mode === 'all') {
+      exHtml = '<div class="lv-exp"><div style="font-size:12px;color:#888780;padding:6px 0;">All users at this level are included.</div></div>';
+    } else if (s.mode === 'off') {
+      exHtml = '<div class="lv-exp"><div style="font-size:12px;color:#888780;padding:6px 0;">Off &mdash; no users at this level included.</div></div>';
+    } else {
+      var users = allUsers[lvl.id] || [];
+      var pillsHtml = '';
+      for (var pi = 0; pi < s.sel.length; pi++) {
+        var pn = s.sel[pi];
+        var pu = null;
+        for (var pui = 0; pui < users.length; pui++) { if (users[pui].n === pn) { pu = users[pui]; break; } }
+        if (pu) pillsHtml += '<div class="pill"><div class="pill-av">' + pu.i + '</div>' + pu.n + '<span class="pill-x" onclick="removeSel(\'' + prefix + '\',\'' + lvl.id + '\',\'' + pn.replace(/'/g,"\\'") + '\')">&#215;</span></div>';
+      }
+      var usersHtml = '';
+      for (var ui = 0; ui < users.length; ui++) {
+        var u = users[ui];
+        var isSel = s.sel.indexOf(u.n) !== -1;
+        usersHtml += '<div class="ui' + (isSel ? ' chk' : '') + '" onclick="toggleSel(\'' + prefix + '\',\'' + lvl.id + '\',\'' + u.n.replace(/'/g,"\\'") + '\')">' +
+          '<div class="uav" style="background:' + u.bg + ';color:' + u.c + ';">' + u.i + '</div>' +
+          '<div class="uin"><div class="unm">' + u.n + '</div>' +
+          '<div class="umt"><span>' + u.r + '</span><span>' + u.f + '</span><span>' + u.l + '</span></div>' +
+          '<div class="ubd"><span class="uba ' + (u.s==='Active'?'ba-t':'ba-g') + '">' + u.s + '</span></div></div>' +
+          '<div class="uck' + (isSel ? ' on' : '') + '"><span style="font-size:10px;color:white;' + (isSel ? '' : 'visibility:hidden;') + '">&#10003;</span></div></div>';
+      }
+      exHtml = '<div class="lv-exp"><div class="sb"><input type="text" placeholder="Search by name, franchise, or location..." oninput="filterUL(\'' + prefix + '-ul-' + lvl.id + '\',this.value)"></div>' +
+        '<div class="ul" id="' + prefix + '-ul-' + lvl.id + '">' + usersHtml + '</div>' +
+        '<div class="pills" id="' + prefix + '-pills-' + lvl.id + '">' + pillsHtml + '</div></div>';
+    }
+
+    var row = document.createElement('div');
+    row.className = 'lv-row';
+    row.innerHTML = '<div class="lv-hdr">' +
+      '<span class="lv-name">' + lvl.label + '</span>' +
+      '<span class="lv-badge ' + bc + '">' + bt + '</span>' +
+      '<div class="lv-tog">' +
+        '<button class="lv-opt' + (s.mode==='all'?' on':'') + '" onclick="setMode(\'' + prefix + '\',\'' + lvl.id + '\',\'all\')">All</button>' +
+        '<button class="lv-opt' + (s.mode==='sel'?' on':'') + '" onclick="setMode(\'' + prefix + '\',\'' + lvl.id + '\',\'sel\')">Selected</button>' +
+        '<button class="lv-opt' + (s.mode==='off'?' on':'') + '" onclick="setMode(\'' + prefix + '\',\'' + lvl.id + '\',\'off\')">Off</button>' +
+      '</div>' +
+      '<span class="chev' + (s.expanded ? ' open' : '') + '" onclick="toggleExp(\'' + prefix + '\',\'' + lvl.id + '\')">&#8964;</span>' +
+      '</div>' +
+      '<div id="' + prefix + '-exp-' + lvl.id + '" style="display:' + (s.expanded ? 'block' : 'none') + ';">' + exHtml + '</div>';
+    list.appendChild(row);
+  }
+}
+
+function setMode(prefix, id, mode) {
+  var st = getState(prefix);
+  st[id].mode = mode;
+  if (mode === 'sel') st[id].expanded = true;
+  renderLevelList(prefix);
+}
+function toggleExp(prefix, id) {
+  var st = getState(prefix);
+  st[id].expanded = !st[id].expanded;
+  renderLevelList(prefix);
+}
+function toggleSel(prefix, id, name) {
+  var st = getState(prefix);
+  if (st[id].mode !== 'sel') return;
+  var idx = st[id].sel.indexOf(name);
+  if (idx === -1) st[id].sel.push(name); else st[id].sel.splice(idx, 1);
+  renderLevelList(prefix);
+}
+function removeSel(prefix, id, name) {
+  var st = getState(prefix);
+  var idx = st[id].sel.indexOf(name);
+  if (idx !== -1) st[id].sel.splice(idx, 1);
+  renderLevelList(prefix);
+}
+function filterUL(listId, query) {
+  var list = document.getElementById(listId);
+  if (!list) return;
+  var items = list.querySelectorAll('.ui');
+  for (var i = 0; i < items.length; i++) {
+    items[i].style.display = items[i].textContent.toLowerCase().indexOf(query.toLowerCase()) !== -1 ? 'flex' : 'none';
+  }
+}
+
+function renderPostSubBody(idx) {
+  var key = idx === 0 ? 'wall' : 'team';
+  var label = idx === 0 ? 'wall posts' : 'team posts';
+  var desc = idx === 0 ? 'Posts to the public FranBuzz wall' : 'Posts within a team';
+  var isChecked = idx === 0;
+  var opacity = isChecked ? '1' : '0.4';
+  var pe = isChecked ? 'all' : 'none';
+
+  var html = '<div class="tog-row">' +
+    '<div><div class="tl">Enable approval for ' + label + '</div><div class="ts">' + desc + ' are held pending review before going live</div></div>' +
+    '<label class="tog"><input type="checkbox"' + (isChecked ? ' checked' : '') + ' id="' + key + 'Toggle" onchange="toggleApproval(\'' + key + '\')"><span class="tsl"></span></label>' +
+    '</div>' +
+    '<div class="app-sec" id="' + key + 'Settings" style="opacity:' + opacity + ';pointer-events:' + pe + ';">' +
+    '<div class="slabel">Who requires approval</div>' +
+    '<div class="lv-list" id="' + key + 'ScopeList"></div>' +
+    '<div class="slabel" style="margin-top:16px;">Post visibility while pending</div>' +
+    '<div class="info-row">Visible to author only &mdash; post shows a "Pending approval" status until reviewed</div>' +
+    '<div class="slabel">Moderator notifications</div>' +
+    '<div class="notif-row"><label class="notif-opt"><input type="checkbox" checked> App notification</label><label class="notif-opt"><input type="checkbox" checked> Email</label></div>' +
+    '</div>';
+
+  document.getElementById('pb' + idx).innerHTML = html;
+  renderLevelList(key);
+}
+
+function toggleApproval(key) {
+  var on = document.getElementById(key + 'Toggle').checked;
+  var s = document.getElementById(key + 'Settings');
+  s.style.opacity = on ? '1' : '0.4';
+  s.style.pointerEvents = on ? 'all' : 'none';
+}
+
+function showMain(idx) {
+  for (var i = 0; i < 3; i++) {
+    document.getElementById('mt' + i).className = 'tab' + (i === idx ? ' on' : '');
+    document.getElementById('mb' + i).style.display = i === idx ? 'block' : 'none';
+  }
+}
+
+function showPostSub(idx) {
+  for (var i = 0; i < 2; i++) {
+    document.getElementById('ps' + i).className = 'stab' + (i === idx ? ' on' : '');
+    document.getElementById('pb' + i).style.display = i === idx ? 'block' : 'none';
+  }
+}
+
+renderKw();
+renderLevelList('mod');
+renderLevelList('bypass');
+renderPostSubBody(0);
+renderPostSubBody(1);
+</script>
+</body>
+</html>

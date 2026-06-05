@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FranBuzz Post Approval — Poster Workflow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; padding: 24px; }
+.stage-nav { display: flex; gap: 0; margin-bottom: 20px; border: 0.5px solid #e0ded8; border-radius: 10px; overflow: hidden; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; }
+.stage-btn { flex: 1; padding: 9px 8px; font-size: 11px; color: #888780; cursor: pointer; background: #f5f4f0; border: none; text-align: center; border-right: 0.5px solid #e0ded8; line-height: 1.4; }
+.stage-btn:last-child { border-right: none; }
+.stage-btn.on { background: #fff; color: #111; font-weight: 500; }
+.stage { display: none; }
+.stage.on { display: flex; flex-direction: column; align-items: center; }
+.phone-frame { width: 300px; background: #1a1a1a; border-radius: 36px; padding: 10px; }
+.phone-screen { background: #fff; border-radius: 28px; overflow: hidden; position: relative; min-height: 560px; }
+.ph-status { background: #fff; padding: 10px 18px 4px; display: flex; justify-content: space-between; }
+.ph-status span { font-size: 11px; font-weight: 500; color: #111; }
+.ph-header { background: #fff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #eee; }
+.ph-tabs { display: flex; border-bottom: 0.5px solid #eee; }
+.ph-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 11px; color: #999; }
+.ph-tab.on { color: #0066cc; border-bottom: 2px solid #0066cc; font-weight: 500; }
+.create-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 0.5px solid #eee; }
+.create-title { font-size: 14px; font-weight: 500; color: #111; }
+.create-author { display: flex; align-items: center; gap: 8px; padding: 12px 16px 8px; }
+.create-av { width: 34px; height: 34px; border-radius: 50%; background: #B5D4F4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #185FA5; flex-shrink: 0; }
+.audience-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; background: #f0f0f0; border-radius: 20px; padding: 2px 8px; color: #555; margin-top: 2px; }
+.create-body { padding: 8px 16px; font-size: 12px; color: #333; line-height: 1.55; min-height: 80px; }
+.create-img { margin: 0 16px 12px; border-radius: 8px; height: 110px; background: #c8d8e8; display: flex; align-items: center; justify-content: center; color: #888; font-size: 12px; position: relative; }
+.create-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 0.5px solid #eee; }
+.post-btn { width: calc(100% - 32px); margin: 0 16px 16px; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; }
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 20; border-radius: 28px; padding: 20px; }
+.modal-box { background: #fff; border-radius: 12px; overflow: hidden; width: 100%; }
+.modal-header { background: #F5A623; padding: 20px 16px; text-align: center; }
+.modal-title { font-size: 13px; font-weight: 500; color: #fff; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 8px; }
+.modal-body { padding: 16px; font-size: 13px; color: #333; line-height: 1.55; text-align: center; }
+.modal-actions { display: flex; border-top: 0.5px solid #eee; }
+.modal-btn { flex: 1; padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; background: none; border: none; color: #0066cc; text-transform: uppercase; letter-spacing: 0.05em; }
+.feed-post { padding: 12px 14px; background: #fff; }
+.post-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.post-av { width: 34px; height: 34px; border-radius: 50%; background: #B5D4F4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #185FA5; flex-shrink: 0; }
+.post-name { font-size: 13px; font-weight: 500; color: #0066cc; }
+.post-meta { font-size: 11px; color: #999; }
+.post-body { font-size: 12px; color: #333; line-height: 1.5; margin-bottom: 8px; }
+.post-img { width: 100%; height: 90px; background: #c8d8e8; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 11px; margin-bottom: 8px; }
+.pending-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: #FAEEDA; color: #633806; border: 0.5px solid #FAC775; border-radius: 20px; padding: 3px 10px; margin-bottom: 8px; }
+.approved-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: #E1F5EE; color: #085041; border: 0.5px solid #9FE1CB; border-radius: 20px; padding: 3px 10px; margin-bottom: 8px; }
+.rejected-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: #FCEBEB; color: #791F1F; border: 0.5px solid #F09595; border-radius: 20px; padding: 3px 10px; margin-bottom: 8px; }
+.rejection-reason { background: #FCEBEB; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #791F1F; margin-bottom: 10px; line-height: 1.5; }
+.post-stats { display: flex; justify-content: space-between; font-size: 11px; color: #999; padding-top: 8px; border-top: 0.5px solid #f0f0f0; }
+.post-actions { display: flex; gap: 16px; margin-top: 6px; }
+.post-action { font-size: 11px; color: #666; }
+.notif-bar { background: #f5f5f5; padding: 10px 12px; }
+.notif-card { background: white; border-radius: 10px; padding: 10px 12px; }
+.notif-hdr { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.notif-icon { width: 18px; height: 18px; border-radius: 4px; background: #185FA5; display: flex; align-items: center; justify-content: center; }
+.notif-app { font-size: 10px; font-weight: 500; color: #666; }
+.notif-time { font-size: 10px; color: #999; margin-left: auto; }
+.notif-title { font-size: 12px; font-weight: 500; color: #111; margin-bottom: 2px; }
+.notif-body { font-size: 11px; color: #555; line-height: 1.4; }
+.delete-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #A32D2D; cursor: pointer; padding: 7px 12px; background: #FCEBEB; border: 0.5px solid #F09595; border-radius: 8px; margin-top: 4px; }
+.hint { margin-top: 12px; font-size: 12px; color: #888780; text-align: center; max-width: 300px; }
+</style>
+</head>
+<body>
+<div class="stage-nav">
+  <button class="stage-btn on" onclick="showStage(0)">1 · Submit</button>
+  <button class="stage-btn" onclick="showStage(1)">2 · Pending</button>
+  <button class="stage-btn" onclick="showStage(2)">3a · Approved</button>
+  <button class="stage-btn" onclick="showStage(3)">3b · Rejected</button>
+</div>
+
+<!-- STAGE 0 -->
+<div class="stage on" id="stage0">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="create-header"><span class="create-title">Create Post</span><span style="font-size:18px;color:#666;cursor:pointer;">&#215;</span></div>
+      <div class="create-author">
+        <div class="create-av">JH</div>
+        <div><div style="font-size:13px;font-weight:500;color:#111;">James Hinks</div><div class="audience-pill">Everyone</div></div>
+      </div>
+      <div class="create-body">We're seeing strong results across the network when teams prompt customers with a simple dessert add-on at checkout. It's a quick win that boosts average order value...</div>
+      <div class="create-img">Team photo</div>
+      <div class="create-toolbar">
+        <div style="display:flex;gap:12px;font-size:18px;color:#888;"></div>
+        <span style="font-size:11px;color:#999;">Max 500 MB</span>
+      </div>
+      <div class="post-btn" onclick="showModal()">POST</div>
+      <div class="modal-overlay" id="confirmModal" style="display:none;">
+        <div class="modal-box">
+          <div class="modal-header">
+            <svg width="48" height="48" viewBox="0 0 48 48" style="display:block;margin:0 auto 8px;"><polygon points="24,6 44,42 4,42" fill="white" opacity="0.9"/><text x="24" y="38" text-anchor="middle" font-size="20" font-weight="bold" fill="#F5A623">!</text></svg>
+            <div class="modal-title">Post submitted</div>
+          </div>
+          <div class="modal-body">Your post has been submitted for approval. You'll be notified once it's reviewed.</div>
+          <div class="modal-actions"><button class="modal-btn" onclick="hideModal()">OK</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Tap POST to see the confirmation modal</div>
+</div>
+
+<!-- STAGE 1 -->
+<div class="stage" id="stage1">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="ph-header">
+        <span style="font-size:18px;color:#333;">&#9776;</span>
+        <span style="font-size:14px;font-weight:500;color:#111;">HUB</span>
+        <span style="font-size:16px;color:#333;"></span>
+      </div>
+      <div class="ph-tabs"><div class="ph-tab on">WALL</div><div class="ph-tab">SAVED</div><div class="ph-tab">INBOX</div><div class="ph-tab">GALLERY</div></div>
+      <div class="feed-post">
+        <div class="post-hdr"><div class="post-av">JH</div><div><div class="post-name">James Hinks</div><div class="post-meta">Just now · FranBuzz</div></div></div>
+        <div class="pending-badge">&#9203; Pending approval</div>
+        <div class="post-body">We're seeing strong results across the network when teams prompt customers with a simple dessert add-on at checkout...</div>
+        <div class="post-img">Team photo</div>
+        <div style="font-size:11px;color:#999;">Only visible to you until approved</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Post visible to author only with "Pending approval" badge</div>
+</div>
+
+<!-- STAGE 2 -->
+<div class="stage" id="stage2">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="notif-bar">
+        <div class="notif-card">
+          <div class="notif-hdr"><div class="notif-icon" style="color:white;font-size:10px;"></div><span class="notif-app">FC Sky · FranBuzz</span><span class="notif-time">now</span></div>
+          <div class="notif-title">Your post has been approved</div>
+          <div class="notif-body">Your post is now live in FranBuzz.</div>
+        </div>
+      </div>
+      <div class="ph-tabs" style="background:#fff;"><div class="ph-tab on">WALL</div><div class="ph-tab">SAVED</div><div class="ph-tab">INBOX</div><div class="ph-tab">GALLERY</div></div>
+      <div class="feed-post">
+        <div class="post-hdr"><div class="post-av">JH</div><div><div class="post-name">James Hinks</div><div class="post-meta">Feb 13, 2026 · FranBuzz</div></div></div>
+        <div class="approved-badge">&#10003; Approved — now live</div>
+        <div class="post-body">We're seeing strong results across the network when teams prompt customers with a simple dessert add-on at checkout...</div>
+        <div class="post-img">Team photo</div>
+        <div class="post-stats"><span>0 Likes</span><span>0 Responses</span></div>
+        <div class="post-actions"><span class="post-action">Like</span><span class="post-action">Response</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">App notification + post goes live immediately</div>
+</div>
+
+<!-- STAGE 3 -->
+<div class="stage" id="stage3">
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="ph-status"><span>9:41</span><span></span></div>
+      <div class="notif-bar">
+        <div class="notif-card">
+          <div class="notif-hdr"><div class="notif-icon" style="background:#A32D2D;color:white;font-size:10px;">&#215;</div><span class="notif-app">FC Sky · FranBuzz</span><span class="notif-time">now</span></div>
+          <div class="notif-title">Your post was not approved</div>
+          <div class="notif-body">Tap to view the reason in your feed.</div>
+        </div>
+      </div>
+      <div class="ph-tabs" style="background:#fff;"><div class="ph-tab on">WALL</div><div class="ph-tab">SAVED</div><div class="ph-tab">INBOX</div><div class="ph-tab">GALLERY</div></div>
+      <div class="feed-post">
+        <div class="post-hdr"><div class="post-av">JH</div><div><div class="post-name">James Hinks</div><div class="post-meta">Feb 13, 2026 · FranBuzz</div></div></div>
+        <div class="rejected-badge">&#215; Not approved</div>
+        <div class="rejection-reason"><strong>Reason:</strong> Please remove the pricing reference in line 3 — this should go through the ops team before publishing network-wide.</div>
+        <div class="post-body">We're seeing strong results across the network when teams prompt customers with a simple dessert add-on at checkout...</div>
+        <div class="post-img">Team photo</div>
+        <div class="delete-btn" onclick="this.closest('.feed-post').style.opacity='0.4'">Delete post</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">App notification + rejection reason + delete option only</div>
+</div>
+
+<script>
+function showStage(idx){[0,1,2,3].forEach(i=>{document.getElementById('stage'+i).classList.toggle('on',i===idx);document.querySelectorAll('.stage-btn')[i].classList.toggle('on',i===idx);});}
+function showModal(){document.getElementById('confirmModal').style.display='flex';}
+function hideModal(){document.getElementById('confirmModal').style.display='none';showStage(1);}
+</script>
+</body>
+</html>
