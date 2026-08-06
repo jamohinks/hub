@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hub Engagement — Franchisor View</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#134564;--orange:#FF8200;--white:#fff;
+  --s0:#f0f4f7;--s1:#e6edf2;--s2:#fff;
+  --tp:#134564;--ts:#2e6585;--tm:#6b8fa3;
+  --bdr:rgba(19,69,100,0.10);--bdr-s:rgba(19,69,100,0.20);
+  --hi-bg:#d1fae5;--hi-c:#065f46;
+  --lo-bg:#fee2e2;--lo-c:#991b1b;
+  --r:8px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--s0);color:var(--tp);font-size:12px;display:flex;flex-direction:column}
+
+.topbar{background:var(--brand);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:44px;flex-shrink:0}
+.topbar-title{color:var(--white);font-size:14px;font-weight:700}
+.vtog{display:flex;border:1px solid rgba(255,255,255,0.25);border-radius:6px;overflow:hidden}
+.vbtn{font-size:11px;font-weight:600;padding:5px 14px;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;border:none;border-right:1px solid rgba(255,255,255,0.2)}
+.vbtn:last-child{border-right:none}
+.vbtn.active{background:var(--orange);color:var(--white)}
+
+.fbar{background:var(--s2);border-bottom:1px solid var(--bdr-s);padding:8px 20px;flex-shrink:0;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:2px}
+.fl{font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:0.05em}
+select,input[type=date]{font-size:11px;padding:4px 7px;border:0.5px solid var(--bdr-s);border-radius:5px;background:var(--s1);color:var(--tp);height:26px}
+.wtog{display:flex;border:0.5px solid var(--bdr-s);border-radius:5px;overflow:hidden;height:26px}
+.wbtn{font-size:10px;font-weight:600;padding:0 10px;background:var(--s1);color:var(--ts);cursor:pointer;border:none;border-right:0.5px solid var(--bdr-s)}
+.wbtn:last-child{border-right:none}
+.wbtn.active{background:var(--brand);color:var(--white)}
+.custom-wrap{display:none;align-items:center;gap:4px}
+.custom-wrap.show{display:flex}
+.dsep{font-size:10px;color:var(--tm);padding-top:14px}
+
+.tabbar{background:var(--s2);border-bottom:2px solid var(--bdr);padding:0 20px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.tabs{display:flex}
+.tab{font-size:11px;font-weight:600;padding:8px 16px;cursor:pointer;color:var(--tm);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab:hover{color:var(--ts)}
+.tab.active{color:var(--brand);border-bottom-color:var(--orange)}
+
+/* Content/Unit view toggle inside tabbar */
+.cvtog{display:flex;border:0.5px solid var(--bdr-s);border-radius:5px;overflow:hidden;height:24px;margin-right:4px}
+.cvbtn{font-size:10px;font-weight:600;padding:0 10px;background:var(--s1);color:var(--ts);cursor:pointer;border:none;border-right:0.5px solid var(--bdr-s);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.cvbtn:last-child{border-right:none}
+.cvbtn.active{background:var(--brand);color:var(--white)}
+
+.content{flex:1;overflow-y:auto;padding:14px 20px}
+
+.sumstrip{display:flex;gap:8px;margin-bottom:12px}
+.stile{background:var(--s2);border:0.5px solid var(--bdr);border-radius:var(--r);padding:9px 12px;flex:1}
+.stile.br{border-top:3px solid var(--brand)}
+.stile.or{border-top:3px solid var(--orange)}
+.slbl{font-size:9px;color:var(--ts);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px}
+.sval{font-size:18px;font-weight:700;color:var(--brand);line-height:1}
+.ssub{font-size:9px;color:var(--tm);margin-top:2px}
+
+.twrap{background:var(--s2);border:0.5px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.thead{background:var(--brand);padding:7px 12px}
+.tgrid{display:grid}
+.th{font-size:10px;font-weight:600;color:rgba(255,255,255,0.75)}
+.th.r{text-align:right}
+.th.hi{color:var(--orange);background:rgba(255,130,0,0.12)}
+.col-hi{background:rgba(255,130,0,0.07);font-weight:700!important;color:var(--brand)}
+.trow{display:grid;padding:7px 12px;border-bottom:0.5px solid var(--bdr);align-items:center}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--s1)}
+.trow.zero{background:rgba(153,27,27,0.03)}
+.r{text-align:right}
+.uname{font-weight:600;color:var(--brand);font-size:11px}
+.umeta{font-size:9px;color:var(--tm);margin-top:1px}
+.val{font-weight:700;color:var(--brand)}
+.bwrap{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.btrack{width:44px;height:4px;background:var(--s0);border-radius:2px;overflow:hidden}
+.bfill{height:100%;border-radius:2px}
+.bval{font-size:10px;font-weight:700;min-width:28px;text-align:right;color:var(--brand)}
+.tier{font-size:9px;padding:1px 6px;border-radius:6px;font-weight:600}
+.tier-hi{background:var(--hi-bg);color:var(--hi-c)}
+.tier-med{background:#fef3c7;color:#92400e}
+.tier-lo{background:var(--lo-bg);color:var(--lo-c)}
+.tier-none{background:var(--s1);color:var(--tm)}
+
+/* Content view — expandable rows */
+.crow{display:grid;padding:7px 12px;border-bottom:0.5px solid var(--bdr);align-items:center;cursor:pointer}
+.crow:hover{background:var(--s1)}
+.crow.expanded{background:var(--s1)}
+.cexp{display:none;background:#f7fafc;border-bottom:0.5px solid var(--bdr)}
+.cexp.open{display:block}
+.cexp-inner{padding:8px 12px 8px 32px}
+.cexp-hdr{display:grid;padding:4px 0;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:0.04em;border-bottom:0.5px solid var(--bdr);margin-bottom:4px}
+.cexp-row{display:grid;padding:4px 0;border-bottom:0.5px solid var(--bdr);font-size:11px;align-items:center}
+.cexp-row:last-child{border-bottom:none}
+.accessed{color:var(--hi-c);font-weight:600}
+.not-accessed{color:var(--lo-c)}
+.ctitle{font-weight:600;color:var(--brand);font-size:11px}
+.cmeta{font-size:9px;color:var(--tm);margin-top:1px}
+.chevron{font-size:12px;color:var(--tm);transition:transform 0.15s;text-align:right}
+.chevron.open{transform:rotate(90deg)}
+.badge-read{background:var(--hi-bg);color:var(--hi-c);font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600}
+.badge-unread{background:var(--lo-bg);color:var(--lo-c);font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600}
+.badge-partial{background:#fef3c7;color:#92400e;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600}
+
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sechdr{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+
+/* Key */
+.key-fab{position:fixed;bottom:16px;right:16px;background:var(--brand);color:var(--white);border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(19,69,100,0.25);display:flex;align-items:center;gap:6px;z-index:100}
+.key-panel{position:fixed;bottom:52px;right:16px;width:340px;background:var(--s2);border:0.5px solid var(--bdr-s);border-radius:10px;box-shadow:0 4px 20px rgba(19,69,100,0.12);display:none;z-index:100;font-size:11px;overflow:hidden}
+.key-panel.open{display:block}
+.key-hdr{background:var(--brand);padding:9px 14px;display:flex;justify-content:space-between;align-items:center}
+.key-hdr span{color:var(--white);font-size:12px;font-weight:700}
+.key-close{color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;line-height:1;background:none;border:none}
+.key-sec{padding:10px 14px;border-bottom:0.5px solid var(--bdr)}
+.key-sec:last-child{border-bottom:none}
+.key-lbl{font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.key-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;color:var(--ts);line-height:1.4}
+.key-note{font-size:10px;color:var(--tm);line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">Hub Engagement — Franchisor View</span>
+  <div class="vtog">
+    <button class="vbtn active" id="vt-perf">Performance by Unit</button>
+    <button class="vbtn" id="vt-detail">Tool Detail</button>
+  </div>
+</div>
+
+<div class="fbar">
+  <div class="fg"><span class="fl">Brand</span><select id="f-brand"><option value="">All brands</option><option>Brand A</option><option>Brand B</option><option>Brand C</option><option>Brand D</option><option>Brand E</option></select></div>
+  <div class="fg"><span class="fl">Region</span><select id="f-region"><option value="">All regions</option><option>Region 1</option><option>Region 2</option><option>Region 3</option><option>Region 4</option></select></div>
+  <div class="fg"><span class="fl">Unit</span><select id="f-unit" style="width:140px"><option value="">All units</option></select></div>
+  <div class="fg"><span class="fl">Owner</span><select id="f-owner" style="width:120px"><option value="">All owners</option></select></div>
+  <div class="fg" id="fg-tier"><span class="fl">Tier</span><select id="f-tier"><option value="">All tiers</option><option>High</option><option>Medium</option><option>Low</option><option>No activity</option></select></div>
+  <div class="fg" id="fg-window-perf">
+    <span class="fl">Window</span>
+    <div class="wtog">
+      <button class="wbtn active" data-w="30">30d</button>
+      <button class="wbtn" data-w="60">60d</button>
+      <button class="wbtn" data-w="90">90d</button>
+    </div>
+  </div>
+  <div class="fg" id="fg-window-detail" style="display:none">
+    <span class="fl">Window</span>
+    <div class="wtog" id="wtog-detail">
+      <button class="wbtn active" data-w="30">30d</button>
+      <button class="wbtn" data-w="60">60d</button>
+      <button class="wbtn" data-w="90">90d</button>
+      <button class="wbtn" data-w="custom">Custom</button>
+    </div>
+  </div>
+  <div class="custom-wrap" id="custom-wrap">
+    <div class="fg"><span class="fl">From</span><input type="date" id="date-from" value="2026-07-01"></div>
+    <span class="dsep">→</span>
+    <div class="fg"><span class="fl">To</span><input type="date" id="date-to" value="2026-08-04"></div>
+  </div>
+</div>
+
+<!-- Performance tabbar -->
+<div class="tabbar" id="tabbar-perf">
+  <div class="tabs">
+    <div class="tab active" data-tab="all">All</div>
+    <div class="tab" data-tab="fb">FranBuzz</div>
+    <div class="tab" data-tab="ts">Top Stories</div>
+    <div class="tab" data-tab="lib">Library</div>
+    <div class="tab" data-tab="sp">Spaces</div>
+    <div class="tab" data-tab="login">Login</div>
+  </div>
+</div>
+
+<!-- Tool Detail tabbar with Unit/Content toggle -->
+<div class="tabbar" id="tabbar-detail" style="display:none">
+  <div class="tabs">
+    <div class="tab active" data-tab="fb">FranBuzz</div>
+    <div class="tab" data-tab="ts">Top Stories</div>
+    <div class="tab" data-tab="lib">Library</div>
+    <div class="tab" data-tab="sp">Spaces</div>
+  </div>
+  <div class="cvtog">
+    <button class="cvbtn active" id="cv-unit"><i class="ti ti-users" style="font-size:10px"></i> Unit View</button>
+    <button class="cvbtn" id="cv-content"><i class="ti ti-file-text" style="font-size:10px"></i> Content View</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- PERFORMANCE BY UNIT -->
+  <div id="view-perf">
+    <div class="sumstrip">
+      <div class="stile br"><div class="slbl">Total units</div><div class="sval" id="s-total">—</div></div>
+      <div class="stile or"><div class="slbl">High</div><div class="sval" style="color:var(--hi-c)" id="s-high">—</div></div>
+      <div class="stile"><div class="slbl">Medium</div><div class="sval" style="color:#92400e" id="s-med">—</div></div>
+      <div class="stile"><div class="slbl">Low / no activity</div><div class="sval" style="color:var(--lo-c)" id="s-low">—</div></div>
+    </div>
+    <div class="twrap">
+      <div class="thead"><div class="tgrid" id="perf-head"></div></div>
+      <div id="perf-body"></div>
+    </div>
+  </div>
+
+  <!-- TOOL DETAIL -->
+  <div id="view-detail" style="display:none">
+    <div class="sumstrip">
+      <div class="stile br"><div class="slbl">FranBuzz interactions</div><div class="sval">4,284</div><div class="ssub" style="color:var(--hi-c)">↑ vs prior</div></div>
+      <div class="stile or"><div class="slbl">Top Stories read rate</div><div class="sval">74%</div><div class="ssub" style="color:var(--hi-c)">↑ 6pp</div></div>
+      <div class="stile br"><div class="slbl">Library accesses</div><div class="sval">6,841</div><div class="ssub" style="color:var(--hi-c)">↑ vs prior</div></div>
+      <div class="stile br"><div class="slbl">Spaces views</div><div class="sval">8,312</div><div class="ssub" style="color:var(--hi-c)">↑ vs prior</div></div>
+      <div class="stile br"><div class="slbl">Active Owners</div><div class="sval">18/20</div></div>
+    </div>
+
+    <!-- UNIT VIEW -->
+    <div id="detail-unit-view">
+      <div id="detail-all" class="twocol">
+        <div>
+          <div id="sec-fb">
+            <div class="sechdr"><i class="ti ti-message-2" style="font-size:11px"></i>FranBuzz</div>
+            <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 50px 50px 54px 24px"><div class="th">#</div><div class="th">Owner</div><div class="th">Unit</div><div class="th">Name</div><div class="th">Brand</div><div class="th">Region</div><div class="th r">React</div><div class="th r">Comments</div><div class="th r">Posts</div><div class="th r">Total</div><div class="th r">▲▼</div></div></div><div id="td-fb"></div></div>
+          </div>
+          <div id="sec-ts">
+            <div class="sechdr"><i class="ti ti-news" style="font-size:11px"></i>Top Stories</div>
+            <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:22px 90px 46px 100px 72px 66px 46px 46px 62px 54px 24px"><div class="th">#</div><div class="th">Owner</div><div class="th">Unit</div><div class="th">Name</div><div class="th">Brand</div><div class="th">Region</div><div class="th r">Read</div><div class="th r">Published</div><div class="th r">Read rate</div><div class="th r">Avg time</div><div class="th r">▲▼</div></div></div><div id="td-ts"></div></div>
+          </div>
+        </div>
+        <div>
+          <div id="sec-lib">
+            <div class="sechdr"><i class="ti ti-files" style="font-size:11px"></i>Library</div>
+            <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 62px 66px 24px"><div class="th">#</div><div class="th">Owner</div><div class="th">Unit</div><div class="th">Name</div><div class="th">Brand</div><div class="th">Region</div><div class="th r">Views</div><div class="th r">Downloads</div><div class="th r">Access rate</div><div class="th r">▲▼</div></div></div><div id="td-lib"></div></div>
+          </div>
+          <div id="sec-sp">
+            <div class="sechdr"><i class="ti ti-layout-board" style="font-size:11px"></i>Spaces</div>
+            <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 62px 62px 24px"><div class="th">#</div><div class="th">Owner</div><div class="th">Unit</div><div class="th">Name</div><div class="th">Brand</div><div class="th">Region</div><div class="th r">Views</div><div class="th r">Published</div><div class="th r">View rate</div><div class="th r">▲▼</div></div></div><div id="td-sp"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT VIEW -->
+    <div id="detail-content-view" style="display:none">
+      <div id="cv-table-fb" style="display:none">
+        <div class="sechdr"><i class="ti ti-message-2" style="font-size:11px"></i>FranBuzz — Posts</div>
+        <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:1fr 100px 60px 60px 60px 70px 24px">
+          <div class="th">Post</div><div class="th">Published</div><div class="th r">React</div><div class="th r">Comments</div><div class="th r">Total</div><div class="th r">Units engaged</div><div class="th"></div>
+        </div></div><div id="cv-fb-body"></div></div>
+      </div>
+      <div id="cv-table-ts" style="display:none">
+        <div class="sechdr"><i class="ti ti-news" style="font-size:11px"></i>Top Stories</div>
+        <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:1fr 100px 60px 60px 70px 70px 24px">
+          <div class="th">Story</div><div class="th">Published</div><div class="th r">Read</div><div class="th r">Not read</div><div class="th r">Read rate</div><div class="th r">Avg time</div><div class="th"></div>
+        </div></div><div id="cv-ts-body"></div></div>
+      </div>
+      <div id="cv-table-lib" style="display:none">
+        <div class="sechdr"><i class="ti ti-files" style="font-size:11px"></i>Library</div>
+        <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:1fr 100px 60px 60px 70px 24px">
+          <div class="th">Document</div><div class="th">Published</div><div class="th r">Views</div><div class="th r">Downloads</div><div class="th r">Access rate</div><div class="th"></div>
+        </div></div><div id="cv-lib-body"></div></div>
+      </div>
+      <div id="cv-table-sp" style="display:none">
+        <div class="sechdr"><i class="ti ti-layout-board" style="font-size:11px"></i>Spaces</div>
+        <div class="twrap"><div class="thead"><div class="tgrid" style="grid-template-columns:1fr 100px 60px 70px 24px">
+          <div class="th">Page</div><div class="th">Published</div><div class="th r">Views</div><div class="th r">View rate</div><div class="th"></div>
+        </div></div><div id="cv-sp-body"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Key FAB -->
+<button class="key-fab" id="key-fab">? Metric key</button>
+<div class="key-panel" id="key-panel">
+  <div class="key-hdr"><span>Metric key</span><button class="key-close" id="key-close">×</button></div>
+  <div class="key-sec">
+    <div class="key-lbl">Composite score</div>
+    <div style="color:var(--ts);line-height:1.5">(FranBuzz + Top Stories + Library + Spaces + Login) ÷ 5. Each component is peer-ranked 0–100% against all Owners in the brand network.</div>
+  </div>
+  <div class="key-sec">
+    <div class="key-lbl">Tool Detail — Unit View</div>
+    <div class="key-note">Shows counts per unit — who is most engaged. Click Content View to see engagement by individual piece of content.</div>
+  </div>
+  <div class="key-sec">
+    <div class="key-lbl">Tool Detail — Content View</div>
+    <div class="key-note">Shows each published item — story, document, post, or page — with engagement counts and a drill-down to see which units have and haven't accessed it. Click any row to expand.</div>
+  </div>
+  <div class="key-sec">
+    <div class="key-lbl">Engagement tiers</div>
+    <div class="key-row"><span class="tier tier-hi">High</span> ≥ 55%</div>
+    <div class="key-row"><span class="tier tier-med">Medium</span> 30–54%</div>
+    <div class="key-row"><span class="tier tier-lo">Low</span> 1–29%</div>
+    <div class="key-row"><span class="tier tier-none">No activity</span> 0%</div>
+  </div>
+  <div class="key-sec">
+    <div class="key-lbl">Trend arrows</div>
+    <div class="key-row" style="gap:16px">
+      <span style="color:var(--hi-c);font-size:14px">↑</span> Higher than prior period
+      <span style="color:var(--lo-c);font-size:14px">↓</span> Lower
+      <span style="color:var(--tm)">—</span> No change
+    </div>
+    <div class="key-note" style="margin-top:6px">Scores calculated nightly. Multi-unit Owners normalised by units owned. Red rows = zero activity this period.</div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {id:"#1042",name:"Unit 1042",owner:"Owner A",brand:"Brand A",region:"Region 1",fb_react:198,fb_cmts:57,fb_posts:84,fb_prev:280,ts_read:18,ts_pub:20,ts_time:"2m 14s",ts_prev:15,lib_views:22,lib_dls:9,lib_pub:38,lib_prev:24,sp_views:12,sp_pub:16,sp_prev:9,login_days:20,login_prev:18},
+  {id:"#0871",name:"Unit 0871",owner:"Owner B",brand:"Brand B",region:"Region 2",fb_react:48,fb_cmts:12,fb_posts:21,fb_prev:38,ts_read:11,ts_pub:20,ts_time:"1m 42s",ts_prev:9,lib_views:6,lib_dls:2,lib_pub:38,lib_prev:5,sp_views:4,sp_pub:16,sp_prev:3,login_days:8,login_prev:6},
+  {id:"#0334",name:"Unit 0334",owner:"Owner C",brand:"Brand C",region:"Region 3",fb_react:6,fb_cmts:1,fb_posts:3,fb_prev:8,ts_read:2,ts_pub:20,ts_time:"0m 48s",ts_prev:3,lib_views:1,lib_dls:0,lib_pub:38,lib_prev:2,sp_views:0,sp_pub:16,sp_prev:1,login_days:2,login_prev:3},
+  {id:"#1198",name:"Unit 1198",owner:"Owner D",brand:"Brand D",region:"Region 1",fb_react:0,fb_cmts:0,fb_posts:0,fb_prev:0,ts_read:0,ts_pub:20,ts_time:"—",ts_prev:0,lib_views:0,lib_dls:0,lib_pub:38,lib_prev:0,sp_views:0,sp_pub:16,sp_prev:0,login_days:0,login_prev:0},
+  {id:"#0512",name:"Unit 0512",owner:"Owner E",brand:"Brand A",region:"Region 1",fb_react:176,fb_cmts:48,fb_posts:71,fb_prev:162,ts_read:17,ts_pub:20,ts_time:"2m 02s",ts_prev:14,lib_views:20,lib_dls:4,lib_pub:38,lib_prev:18,sp_views:9,sp_pub:16,sp_prev:7,login_days:19,login_prev:17},
+  {id:"#0788",name:"Unit 0788",owner:"Owner F",brand:"Brand E",region:"Region 1",fb_react:104,fb_cmts:31,fb_posts:58,fb_prev:92,ts_read:15,ts_pub:20,ts_time:"1m 54s",ts_prev:12,lib_views:16,lib_dls:3,lib_pub:38,lib_prev:14,sp_views:7,sp_pub:16,sp_prev:5,login_days:14,login_prev:11},
+  {id:"#1301",name:"Unit 1301",owner:"Owner G",brand:"Brand B",region:"Region 2",fb_react:312,fb_cmts:88,fb_posts:92,fb_prev:271,ts_read:19,ts_pub:20,ts_time:"2m 28s",ts_prev:17,lib_views:32,lib_dls:6,lib_pub:38,lib_prev:28,sp_views:14,sp_pub:16,sp_prev:11,login_days:26,login_prev:22},
+  {id:"#0221",name:"Unit 0221",owner:"Owner H",brand:"Brand C",region:"Region 4",fb_react:24,fb_cmts:6,fb_posts:12,fb_prev:19,ts_read:6,ts_pub:20,ts_time:"1m 18s",ts_prev:5,lib_views:3,lib_dls:1,lib_pub:38,lib_prev:3,sp_views:2,sp_pub:16,sp_prev:1,login_days:4,login_prev:3},
+  {id:"#0944",name:"Unit 0944",owner:"Owner I",brand:"Brand A",region:"Region 3",fb_react:88,fb_cmts:24,fb_posts:47,fb_prev:79,ts_read:13,ts_pub:20,ts_time:"1m 48s",ts_prev:11,lib_views:11,lib_dls:3,lib_pub:38,lib_prev:10,sp_views:5,sp_pub:16,sp_prev:4,login_days:11,login_prev:9},
+  {id:"#1455",name:"Unit 1455",owner:"Owner J",brand:"Brand D",region:"Region 1",fb_react:62,fb_cmts:18,fb_posts:33,fb_prev:54,ts_read:9,ts_pub:20,ts_time:"1m 32s",ts_prev:7,lib_views:8,lib_dls:2,lib_pub:38,lib_prev:7,sp_views:3,sp_pub:16,sp_prev:2,login_days:8,login_prev:6},
+  {id:"#0667",name:"Unit 0667",owner:"Owner K",brand:"Brand E",region:"Region 2",fb_react:0,fb_cmts:0,fb_posts:0,fb_prev:2,ts_read:1,ts_pub:20,ts_time:"0m 22s",ts_prev:1,lib_views:2,lib_dls:1,lib_pub:38,lib_prev:2,sp_views:0,sp_pub:16,sp_prev:0,login_days:1,login_prev:2},
+  {id:"#1122",name:"Unit 1122",owner:"Owner L",brand:"Brand C",region:"Region 3",fb_react:124,fb_cmts:38,fb_posts:66,fb_prev:108,ts_read:16,ts_pub:20,ts_time:"2m 04s",ts_prev:13,lib_views:18,lib_dls:4,lib_pub:38,lib_prev:16,sp_views:8,sp_pub:16,sp_prev:6,login_days:16,login_prev:14},
+  {id:"#0389",name:"Unit 0389",owner:"Owner M",brand:"Brand B",region:"Region 4",fb_react:241,fb_cmts:64,fb_posts:79,fb_prev:218,ts_read:18,ts_pub:20,ts_time:"2m 18s",ts_prev:15,lib_views:27,lib_dls:5,lib_pub:38,lib_prev:24,sp_views:11,sp_pub:16,sp_prev:8,login_days:22,login_prev:19},
+  {id:"#1567",name:"Unit 1567",owner:"Owner N",brand:"Brand A",region:"Region 2",fb_react:82,fb_cmts:22,fb_posts:44,fb_prev:76,ts_read:12,ts_pub:20,ts_time:"1m 38s",ts_prev:10,lib_views:13,lib_dls:3,lib_pub:38,lib_prev:12,sp_views:6,sp_pub:16,sp_prev:4,login_days:10,login_prev:9},
+  {id:"#0103",name:"Unit 0103",owner:"Owner O",brand:"Brand D",region:"Region 1",fb_react:12,fb_cmts:4,fb_posts:8,fb_prev:10,ts_read:4,ts_pub:20,ts_time:"1m 04s",ts_prev:3,lib_views:3,lib_dls:1,lib_pub:38,lib_prev:2,sp_views:1,sp_pub:16,sp_prev:1,login_days:3,login_prev:2},
+  {id:"#1689",name:"Unit 1689",owner:"Owner P",brand:"Brand E",region:"Region 4",fb_react:0,fb_cmts:0,fb_posts:0,fb_prev:0,ts_read:0,ts_pub:20,ts_time:"—",ts_prev:0,lib_views:0,lib_dls:0,lib_pub:38,lib_prev:0,sp_views:0,sp_pub:16,sp_prev:0,login_days:0,login_prev:0},
+  {id:"#0845",name:"Unit 0845",owner:"Owner Q",brand:"Brand C",region:"Region 3",fb_react:104,fb_cmts:29,fb_posts:55,fb_prev:92,ts_read:14,ts_pub:20,ts_time:"1m 52s",ts_prev:11,lib_views:15,lib_dls:3,lib_pub:38,lib_prev:14,sp_views:6,sp_pub:16,sp_prev:4,login_days:13,login_prev:11},
+  {id:"#1234",name:"Unit 1234",owner:"Owner R",brand:"Brand B",region:"Region 2",fb_react:278,fb_cmts:71,fb_posts:88,fb_prev:248,ts_read:20,ts_pub:20,ts_time:"2m 44s",ts_prev:18,lib_views:35,lib_dls:7,lib_pub:38,lib_prev:29,sp_views:13,sp_pub:16,sp_prev:10,login_days:24,login_prev:21},
+  {id:"#0456",name:"Unit 0456",owner:"Owner S",brand:"Brand A",region:"Region 1",fb_react:72,fb_cmts:19,fb_posts:39,fb_prev:64,ts_read:10,ts_pub:20,ts_time:"1m 28s",ts_prev:8,lib_views:10,lib_dls:3,lib_pub:38,lib_prev:9,sp_views:4,sp_pub:16,sp_prev:3,login_days:9,login_prev:7},
+  {id:"#1890",name:"Unit 1890",owner:"Owner T",brand:"Brand D",region:"Region 4",fb_react:48,fb_cmts:13,fb_posts:26,fb_prev:40,ts_read:7,ts_pub:20,ts_time:"1m 14s",ts_prev:6,lib_views:7,lib_dls:2,lib_pub:38,lib_prev:6,sp_views:2,sp_pub:16,sp_prev:1,login_days:6,login_prev:5},
+];
+
+// Content data — what was published
+const CONTENT_TS = [
+  {title:"Q3 Operations Update",pub:"2026-07-28",read:17,total:20,time:"2m 14s"},
+  {title:"New Franchise Standards 2026",pub:"2026-07-21",read:20,total:20,time:"3m 02s"},
+  {title:"Health & Safety Reminder",pub:"2026-07-14",read:14,total:20,time:"1m 48s"},
+  {title:"Brand Refresh Guidelines",pub:"2026-07-07",read:11,total:20,time:"2m 31s"},
+  {title:"Technology Rollout Notice",pub:"2026-06-30",read:8,total:20,time:"1m 22s"},
+];
+const CONTENT_LIB = [
+  {title:"Operations Manual v4.2",pub:"2026-07-25",type:"PDF",views:18,dls:12,total:20},
+  {title:"Franchise Agreement Template",pub:"2026-07-18",type:"DOCX",views:15,dls:9,total:20},
+  {title:"Brand Asset Pack",pub:"2026-07-10",type:"ZIP",views:12,dls:14,total:20},
+  {title:"Training Schedule Q3",pub:"2026-07-03",type:"XLSX",views:9,dls:3,total:20},
+  {title:"Supplier Contact List",pub:"2026-06-26",type:"PDF",views:6,dls:2,total:20},
+  {title:"Safety Audit Checklist",pub:"2026-06-19",type:"PDF",views:4,dls:1,total:20},
+];
+const CONTENT_SP = [
+  {title:"Operations Hub",pub:"2026-07-20",views:16,total:20},
+  {title:"Brand Standards",pub:"2026-07-13",views:14,total:20},
+  {title:"HR Policies",pub:"2026-07-06",views:10,total:20},
+  {title:"Technology Resources",pub:"2026-06-29",views:7,total:20},
+  {title:"Training & Development",pub:"2026-06-22",views:5,total:20},
+];
+const CONTENT_FB = [
+  {title:"Q3 kickoff — let's make it count!",pub:"2026-08-01",react:142,cmts:38,total:20},
+  {title:"New supplier partnership announcement",pub:"2026-07-24",react:98,cmts:22,total:20},
+  {title:"Congrats to top performers this month",pub:"2026-07-17",react:187,cmts:51,total:20},
+  {title:"Brand refresh — feedback welcome",pub:"2026-07-10",react:76,cmts:44,total:20},
+  {title:"Reminder: safety audit due next week",pub:"2026-07-03",react:31,cmts:8,total:20},
+];
+
+// Populate unit/owner dropdowns
+const unitSel = document.getElementById('f-unit');
+const ownerSel = document.getElementById('f-owner');
+const owners = [...new Set(DATA.map(r=>r.owner))].sort();
+DATA.forEach(r => {
+  const o = document.createElement('option');
+  o.value = r.id; o.textContent = r.name + ' ' + r.id;
+  unitSel.appendChild(o);
+});
+owners.forEach(ow => {
+  const o = document.createElement('option');
+  o.value = ow; o.textContent = ow;
+  ownerSel.appendChild(o);
+});
+
+// Helpers
+function bcol(v){ return v>=55?'var(--brand)':v>=30?'#d97706':'#dc2626'; }
+function tr(a,b){ return a>b?'<span style="color:var(--hi-c)">↑</span>':a<b?'<span style="color:var(--lo-c)">↓</span>':'<span style="color:var(--tm)">—</span>'; }
+function med(i){ return i<3?['🥇','🥈','🥉'][i]:'#'+(i+1); }
+function tierLabel(s){ return s>=55?'High':s>=30?'Medium':s>0?'Low':'No activity'; }
+function tierCls(s){ return s>=55?'tier-hi':s>=30?'tier-med':s>0?'tier-lo':'tier-none'; }
+function pct(n,d){ return d?Math.round(n/d*100):0; }
+
+// State
+let curView = 'perf';
+let perfTab = 'all';
+let detailTab = 'fb';
+let contentView = false;
+
+// Compute scores
+function compute(data) {
+  const maxFb = Math.max(...data.map(r=>r.fb_react+r.fb_cmts+r.fb_posts)) || 1;
+  return data.map(r => {
+    const fb_pct = Math.round((r.fb_react+r.fb_cmts+r.fb_posts)/maxFb*100);
+    const ts_pct = r.ts_pub ? Math.round(r.ts_read/r.ts_pub*100) : 0;
+    const lib_pct = Math.round(r.lib_views/r.lib_pub*100);
+    const sp_pct = r.sp_pub ? Math.round(r.sp_views/r.sp_pub*100) : 0;
+    const login_pct = Math.round(r.login_days/30*100);
+    const score = Math.round((fb_pct+ts_pct+lib_pct+sp_pct+login_pct)/5);
+    return {...r, fb_pct, ts_pct, lib_pct, sp_pct, login_pct, score};
+  });
+}
+
+// Filter
+function filtered() {
+  const br = document.getElementById('f-brand').value;
+  const rg = document.getElementById('f-region').value;
+  const un = document.getElementById('f-unit').value;
+  const ti = document.getElementById('f-tier').value;
+  const ow = document.getElementById('f-owner').value;
+  const base = DATA.filter(r => {
+    if(br && r.brand!==br) return false;
+    if(rg && r.region!==rg) return false;
+    if(un && r.id!==un) return false;
+    if(ow && r.owner!==ow) return false;
+    return true;
+  });
+  const computed = compute(base);
+  return ti ? computed.filter(r=>tierLabel(r.score)===ti) : computed;
+}
+
+// Render Performance
+const PGRID = '22px 90px 46px 110px 76px 68px 46px 52px 54px 50px 50px 52px 68px';
+const PCOLS = [{l:'#'},{l:'Owner'},{l:'Unit ID'},{l:'Name'},{l:'Brand'},{l:'Region'},{l:'Score',r:1,k:'score'},{l:'FranBuzz',r:1,k:'fb_pct'},{l:'Top Stories',r:1,k:'ts_pct'},{l:'Library',r:1,k:'lib_pct'},{l:'Spaces',r:1,k:'sp_pct'},{l:'Login',r:1,k:'login_pct'},{l:'Tier',r:1}];
+
+function renderPerf() {
+  const sortKey = {fb:'fb_pct',ts:'ts_pct',lib:'lib_pct',sp:'sp_pct',login:'login_pct'}[perfTab] || 'score';
+  const all = filtered().sort((a,b)=>b[sortKey]-a[sortKey]);
+  document.getElementById('s-total').textContent = all.length;
+  document.getElementById('s-high').textContent = all.filter(r=>r.score>=55).length;
+  document.getElementById('s-med').textContent = all.filter(r=>r.score>=30&&r.score<55).length;
+  document.getElementById('s-low').textContent = all.filter(r=>r.score<30).length;
+  document.getElementById('perf-head').style.gridTemplateColumns = PGRID;
+  document.getElementById('perf-head').innerHTML = PCOLS.map(c=>`<div class="th${c.r?' r':''} ${c.k===sortKey?'hi':''}">${c.l}</div>`).join('');
+  const colIdx={score:6,fb_pct:7,ts_pct:8,lib_pct:9,sp_pct:10,login_pct:11};
+  const hi=colIdx[sortKey];
+  document.getElementById('perf-body').innerHTML = all.map((r,i)=>`
+    <div class="trow${r.score===0?' zero':''}" style="grid-template-columns:${PGRID}">
+      <div style="font-size:10px;color:var(--tm);text-align:center">${med(i)}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--brand)">${r.owner}</div>
+      <div style="font-size:11px;color:var(--tm)">${r.id}</div>
+      <div style="font-size:11px">${r.name}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.brand}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.region}</div>
+      <div class="r ${hi===6?'col-hi':''}" style="font-size:12px;font-weight:700;color:var(--brand)">${r.score}%</div>
+      <div class="r ${hi===7?'col-hi':''}" style="font-size:11px;font-weight:600">${r.fb_pct}%</div>
+      <div class="r ${hi===8?'col-hi':''}" style="font-size:11px;font-weight:600">${r.ts_pct}%</div>
+      <div class="r ${hi===9?'col-hi':''}" style="font-size:11px;font-weight:600">${r.lib_pct}%</div>
+      <div class="r ${hi===10?'col-hi':''}" style="font-size:11px;font-weight:600">${r.sp_pct}%</div>
+      <div class="r ${hi===11?'col-hi':''}" style="font-size:11px;font-weight:600">${r.login_pct}%</div>
+      <div class="r"><span class="tier ${tierCls(r.score)}">${tierLabel(r.score)}</span></div>
+    </div>`).join('');
+}
+
+// Render Unit Detail
+function renderDetail() {
+  const all = filtered();
+  // FranBuzz
+  const fb = [...all].sort((a,b)=>(b.fb_react+b.fb_cmts+b.fb_posts)-(a.fb_react+a.fb_cmts+a.fb_posts));
+  document.getElementById('td-fb').innerHTML = fb.map((r,i)=>{
+    const tot=r.fb_react+r.fb_cmts+r.fb_posts;
+    return `<div class="trow${tot===0?' zero':''}" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 50px 50px 54px 24px">
+      <div style="font-size:10px;color:var(--tm);text-align:center">${med(i)}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--brand)">${r.owner}</div>
+      <div style="font-size:11px;color:var(--tm)">${r.id}</div>
+      <div style="font-size:11px">${r.name}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.brand}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.region}</div>
+      <div class="r val">${r.fb_react}</div><div class="r val">${r.fb_cmts}</div><div class="r val">${r.fb_posts}</div>
+      <div class="r" style="font-size:12px;font-weight:700;color:var(--brand)">${tot}</div>
+      <div class="r">${tr(tot,r.fb_prev)}</div>
+    </div>`;
+  }).join('');
+  // Top Stories
+  const ts = [...all].sort((a,b)=>(b.ts_read/b.ts_pub)-(a.ts_read/a.ts_pub));
+  document.getElementById('td-ts').innerHTML = ts.map((r,i)=>{
+    const rate=pct(r.ts_read,r.ts_pub), prev=pct(r.ts_prev,r.ts_pub);
+    return `<div class="trow${r.ts_read===0?' zero':''}" style="grid-template-columns:22px 90px 46px 100px 72px 66px 46px 46px 62px 54px 24px">
+      <div style="font-size:10px;color:var(--tm);text-align:center">${med(i)}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--brand)">${r.owner}</div>
+      <div style="font-size:11px;color:var(--tm)">${r.id}</div>
+      <div style="font-size:11px">${r.name}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.brand}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.region}</div>
+      <div class="r val">${r.ts_read}</div><div class="r" style="color:var(--tm)">${r.ts_pub}</div>
+      <div class="r" style="font-size:11px;font-weight:700;color:var(--brand)">${rate}%</div>
+      <div class="r" style="font-size:10px;color:var(--ts)">${r.ts_time}</div>
+      <div class="r">${tr(rate,prev)}</div>
+    </div>`;
+  }).join('');
+  // Library
+  const lib = [...all].sort((a,b)=>b.lib_views-a.lib_views);
+  document.getElementById('td-lib').innerHTML = lib.map((r,i)=>{
+    const rate=pct(r.lib_views,r.lib_pub);
+    return `<div class="trow${r.lib_views===0?' zero':''}" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 62px 66px 24px">
+      <div style="font-size:10px;color:var(--tm);text-align:center">${med(i)}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--brand)">${r.owner}</div>
+      <div style="font-size:11px;color:var(--tm)">${r.id}</div>
+      <div style="font-size:11px">${r.name}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.brand}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.region}</div>
+      <div class="r val">${r.lib_views}</div><div class="r val">${r.lib_dls}</div>
+      <div class="r" style="font-size:11px;font-weight:700;color:var(--brand)">${rate}%</div>
+      <div class="r">${tr(r.lib_views,r.lib_prev)}</div>
+    </div>`;
+  }).join('');
+  // Spaces
+  const sp = [...all].sort((a,b)=>b.sp_views-a.sp_views);
+  document.getElementById('td-sp').innerHTML = sp.map((r,i)=>{
+    const rate=pct(r.sp_views,r.sp_pub);
+    return `<div class="trow${r.sp_views===0?' zero':''}" style="grid-template-columns:22px 90px 46px 100px 72px 66px 50px 62px 62px 24px">
+      <div style="font-size:10px;color:var(--tm);text-align:center">${med(i)}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--brand)">${r.owner}</div>
+      <div style="font-size:11px;color:var(--tm)">${r.id}</div>
+      <div style="font-size:11px">${r.name}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.brand}</div>
+      <div style="font-size:11px;color:var(--ts)">${r.region}</div>
+      <div class="r val">${r.sp_views}</div><div class="r" style="color:var(--tm)">${r.sp_pub}</div>
+      <div class="r" style="font-size:11px;font-weight:700;color:var(--brand)">${rate}%</div>
+      <div class="r">${tr(r.sp_views,r.sp_prev)}</div>
+    </div>`;
+  }).join('');
+}
+
+// Generate per-unit access rows for content view drill-down
+function unitRows(units, accessedFn, grid, hdrs, rowFn) {
+  const accessed = units.filter(accessedFn);
+  const notAccessed = units.filter(u=>!accessedFn(u));
+  let html = `<div class="cexp-hdr" style="grid-template-columns:${grid}">`;
+  hdrs.forEach(h => html += `<div>${h}</div>`);
+  html += '</div>';
+  accessed.forEach(u => { html += rowFn(u, true); });
+  notAccessed.forEach(u => { html += rowFn(u, false); });
+  return html;
+}
+
+// Render Content View
+function renderContentView() {
+  const units = filtered();
+
+  // FranBuzz — posts
+  document.getElementById('cv-fb-body').innerHTML = CONTENT_FB.map((c,ci)=>{
+    const rate = pct(c.total - Math.floor(c.total * 0.3 * (ci+1)/CONTENT_FB.length * 2), c.total);
+    const engaged = units.filter((_,i) => i < Math.round(units.length * (c.total - ci*2) / c.total));
+    const engCount = Math.min(engaged.length, units.length);
+    const id = `cv-fb-${ci}`;
+    const expHtml = `<div class="cexp-hdr" style="grid-template-columns:120px 60px 50px 50px 60px 1fr"><div>Owner</div><div>Unit</div><div class="r">Reactions</div><div class="r">Comments</div><div class="r">Posts</div><div></div></div>`
+      + units.map((u,i) => {
+        const hasEngaged = i < engCount;
+        const react = hasEngaged ? Math.max(0, Math.round(u.fb_react / 5)) : 0;
+        const cmts = hasEngaged ? Math.max(0, Math.round(u.fb_cmts / 5)) : 0;
+        const posts = hasEngaged ? Math.max(0, Math.round(u.fb_posts / 5)) : 0;
+        return `<div class="cexp-row" style="grid-template-columns:120px 60px 50px 50px 60px 1fr">
+          <div style="font-weight:600;color:var(--brand)">${u.owner}</div>
+          <div style="color:var(--tm)">${u.id}</div>
+          <div class="r">${react}</div><div class="r">${cmts}</div><div class="r">${posts}</div>
+          <div>${hasEngaged ? '<span class="badge-read">Engaged</span>' : '<span class="badge-unread">No activity</span>'}</div>
+        </div>`;
+      }).join('');
+    return `
+      <div class="crow" style="grid-template-columns:1fr 100px 60px 60px 60px 70px 24px" onclick="toggleExp('${id}',this)">
+        <div><div class="ctitle">${c.title}</div><div class="cmeta">Post · ${c.pub}</div></div>
+        <div style="font-size:10px;color:var(--tm)">${c.pub}</div>
+        <div class="r val">${c.react}</div><div class="r val">${c.cmts}</div>
+        <div class="r" style="font-weight:700;color:var(--brand)">${c.react+c.cmts}</div>
+        <div class="r">${engCount} of ${units.length} units</div>
+        <div class="chevron" id="${id}-chev">›</div>
+      </div>
+      <div class="cexp" id="${id}"><div class="cexp-inner">${expHtml}</div></div>`;
+  }).join('');
+
+  // Top Stories
+  document.getElementById('cv-ts-body').innerHTML = CONTENT_TS.map((c,ci)=>{
+    const readCount = Math.min(c.read, units.length);
+    const id = `cv-ts-${ci}`;
+    const expHtml = units.map((u,i) => {
+      const hasRead = i < readCount;
+      return `<div class="cexp-row" style="grid-template-columns:140px 60px 1fr 80px">
+        <div style="font-weight:600;color:var(--brand)">${u.owner}</div>
+        <div style="color:var(--tm)">${u.id}</div>
+        <div>${hasRead ? '<span class="badge-read">✓ Read</span>' : '<span class="badge-unread">✗ Not read</span>'}</div>
+        <div style="color:var(--tm);font-size:10px">${hasRead ? c.time : '—'}</div>
+      </div>`;
+    }).join('');
+    const expHdr = `<div class="cexp-hdr" style="grid-template-columns:140px 60px 1fr 80px"><div>Owner</div><div>Unit</div><div>Status</div><div>Time on page</div></div>`;
+    const rateVal = pct(readCount, units.length);
+    const badge = rateVal===100?'badge-read':rateVal>=50?'badge-partial':'badge-unread';
+    return `
+      <div class="crow" style="grid-template-columns:1fr 100px 60px 60px 70px 70px 24px" onclick="toggleExp('${id}',this)">
+        <div><div class="ctitle">${c.title}</div><div class="cmeta">Top Story · ${c.pub}</div></div>
+        <div style="font-size:10px;color:var(--tm)">${c.pub}</div>
+        <div class="r val">${readCount}</div>
+        <div class="r" style="color:var(--lo-c);font-weight:600">${units.length - readCount}</div>
+        <div class="r"><span class="${badge}">${rateVal}%</span></div>
+        <div class="r" style="color:var(--tm);font-size:10px">${c.time}</div>
+        <div class="chevron" id="${id}-chev">›</div>
+      </div>
+      <div class="cexp" id="${id}"><div class="cexp-inner">${expHdr}${expHtml}</div></div>`;
+  }).join('');
+
+  // Library
+  document.getElementById('cv-lib-body').innerHTML = CONTENT_LIB.map((c,ci)=>{
+    const viewCount = Math.min(c.views, units.length);
+    const dlCount = Math.min(c.dls, units.length);
+    const id = `cv-lib-${ci}`;
+    const expHtml = units.map((u,i) => {
+      const viewed = i < viewCount;
+      const downloaded = i < dlCount;
+      const status = downloaded ? '<span class="badge-read">✓ Downloaded</span>' : viewed ? '<span class="badge-partial">✓ Viewed</span>' : '<span class="badge-unread">✗ Not accessed</span>';
+      return `<div class="cexp-row" style="grid-template-columns:140px 60px 1fr">
+        <div style="font-weight:600;color:var(--brand)">${u.owner}</div>
+        <div style="color:var(--tm)">${u.id}</div>
+        <div>${status}</div>
+      </div>`;
+    }).join('');
+    const expHdr = `<div class="cexp-hdr" style="grid-template-columns:140px 60px 1fr"><div>Owner</div><div>Unit</div><div>Status</div></div>`;
+    const rateVal = pct(viewCount, units.length);
+    return `
+      <div class="crow" style="grid-template-columns:1fr 100px 60px 60px 70px 24px" onclick="toggleExp('${id}',this)">
+        <div><div class="ctitle">${c.title}</div><div class="cmeta">${c.type} · ${c.pub}</div></div>
+        <div style="font-size:10px;color:var(--tm)">${c.pub}</div>
+        <div class="r val">${viewCount}</div>
+        <div class="r val">${dlCount}</div>
+        <div class="r"><span class="${rateVal>=70?'badge-read':rateVal>=40?'badge-partial':'badge-unread'}">${rateVal}%</span></div>
+        <div class="chevron" id="${id}-chev">›</div>
+      </div>
+      <div class="cexp" id="${id}"><div class="cexp-inner">${expHdr}${expHtml}</div></div>`;
+  }).join('');
+
+  // Spaces
+  document.getElementById('cv-sp-body').innerHTML = CONTENT_SP.map((c,ci)=>{
+    const viewCount = Math.min(c.views, units.length);
+    const id = `cv-sp-${ci}`;
+    const expHtml = units.map((u,i) => {
+      const viewed = i < viewCount;
+      return `<div class="cexp-row" style="grid-template-columns:140px 60px 1fr">
+        <div style="font-weight:600;color:var(--brand)">${u.owner}</div>
+        <div style="color:var(--tm)">${u.id}</div>
+        <div>${viewed ? '<span class="badge-read">✓ Viewed</span>' : '<span class="badge-unread">✗ Not viewed</span>'}</div>
+      </div>`;
+    }).join('');
+    const expHdr = `<div class="cexp-hdr" style="grid-template-columns:140px 60px 1fr"><div>Owner</div><div>Unit</div><div>Status</div></div>`;
+    const rateVal = pct(viewCount, units.length);
+    return `
+      <div class="crow" style="grid-template-columns:1fr 100px 60px 70px 24px" onclick="toggleExp('${id}',this)">
+        <div><div class="ctitle">${c.title}</div><div class="cmeta">Space page · ${c.pub}</div></div>
+        <div style="font-size:10px;color:var(--tm)">${c.pub}</div>
+        <div class="r val">${viewCount}</div>
+        <div class="r"><span class="${rateVal>=70?'badge-read':rateVal>=40?'badge-partial':'badge-unread'}">${rateVal}%</span></div>
+        <div class="chevron" id="${id}-chev">›</div>
+      </div>
+      <div class="cexp" id="${id}"><div class="cexp-inner">${expHdr}${expHtml}</div></div>`;
+  }).join('');
+}
+
+// Toggle expand row
+function toggleExp(id, rowEl) {
+  const exp = document.getElementById(id);
+  const chev = document.getElementById(id+'-chev');
+  const open = exp.classList.toggle('open');
+  chev.classList.toggle('open', open);
+  rowEl.classList.toggle('expanded', open);
+}
+
+// Set content view mode
+function setContentView(isContent) {
+  contentView = isContent;
+  document.getElementById('cv-unit').classList.toggle('active', !isContent);
+  document.getElementById('cv-content').classList.toggle('active', isContent);
+  document.getElementById('detail-unit-view').style.display = isContent ? 'none' : 'block';
+  document.getElementById('detail-content-view').style.display = isContent ? 'block' : 'none';
+  if(isContent) renderContentView();
+  else renderDetail();
+  // Show correct content tab
+  showContentTab(detailTab);
+}
+
+function showContentTab(tab) {
+  ['fb','ts','lib','sp'].forEach(id => {
+    const el = document.getElementById('cv-table-'+id);
+    if(el) el.style.display = (tab===id) ? 'block' : 'none';
+  });
+}
+
+// Switch view
+function setView(v) {
+  curView = v;
+  document.getElementById('view-perf').style.display = v==='perf'?'block':'none';
+  document.getElementById('view-detail').style.display = v==='detail'?'block':'none';
+  document.getElementById('vt-perf').classList.toggle('active', v==='perf');
+  document.getElementById('vt-detail').classList.toggle('active', v==='detail');
+  document.getElementById('tabbar-perf').style.display = v==='perf'?'flex':'none';
+  document.getElementById('tabbar-detail').style.display = v==='detail'?'flex':'none';
+  document.getElementById('fg-window-perf').style.display = v==='perf'?'flex':'none';
+  document.getElementById('fg-window-detail').style.display = v==='detail'?'flex':'none';
+  document.getElementById('fg-tier').style.display = v==='perf'?'flex':'none';
+  if(v==='perf') { document.getElementById('custom-wrap').classList.remove('show'); renderPerf(); }
+  else { setDetailTab(detailTab); }
+}
+
+function setPerfTab(tab) {
+  perfTab = tab;
+  document.querySelectorAll('#tabbar-perf .tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  renderPerf();
+}
+
+function setDetailTab(tab) {
+  detailTab = tab;
+  document.querySelectorAll('#tabbar-detail .tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  if(contentView) {
+    showContentTab(tab);
+    renderContentView();
+  } else {
+    ['fb','ts','lib','sp'].forEach(id => {
+      const el = document.getElementById('sec-'+id);
+      if(el) el.style.display = (tab==='all'||tab===id) ? 'block' : 'none';
+    });
+    document.getElementById('detail-all').style.gridTemplateColumns = tab==='all' ? '1fr 1fr' : '1fr';
+    renderDetail();
+  }
+}
+
+// Event listeners
+document.getElementById('vt-perf').addEventListener('click', () => setView('perf'));
+document.getElementById('vt-detail').addEventListener('click', () => setView('detail'));
+document.getElementById('cv-unit').addEventListener('click', () => setContentView(false));
+document.getElementById('cv-content').addEventListener('click', () => setContentView(true));
+
+document.querySelectorAll('#tabbar-perf .tab').forEach(t => {
+  t.addEventListener('click', () => setPerfTab(t.dataset.tab));
+});
+document.querySelectorAll('#tabbar-detail .tab').forEach(t => {
+  t.addEventListener('click', () => setDetailTab(t.dataset.tab));
+});
+
+document.querySelectorAll('.wbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.wtog').querySelectorAll('.wbtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('custom-wrap').classList.toggle('show', btn.dataset.w==='custom');
+  });
+});
+
+['f-brand','f-region','f-unit','f-owner','f-tier'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', () => {
+    if(curView==='perf') renderPerf();
+    else if(contentView) renderContentView();
+    else renderDetail();
+  });
+});
+
+document.getElementById('key-fab').addEventListener('click', () => document.getElementById('key-panel').classList.toggle('open'));
+document.getElementById('key-close').addEventListener('click', () => document.getElementById('key-panel').classList.remove('open'));
+
+// Init
+renderPerf();
+</script>
+</body>
+</html>

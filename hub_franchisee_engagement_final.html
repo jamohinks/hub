@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Hub Engagement — Brad Murray</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --brand:#134564;--orange:#FF8200;--white:#ffffff;
+  --s0:#f0f4f7;--s1:#e6edf2;--s2:#ffffff;
+  --tp:#134564;--ts:#2e6585;--tm:#6b8fa3;
+  --dan:#991b1b;
+  --bdr:rgba(19,69,100,0.10);--bdr-s:rgba(19,69,100,0.20);
+  --r:10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --s0:#0f1117;--s1:#171b24;--s2:#1f2433;
+  --tp:#e8ecf5;--ts:#9099b0;--tm:#5a6070;
+  --bsuc:#14532d;--bwar:#78350f;--bacc:#1a2d4a;
+  --bdr:rgba(255,255,255,0.07);--bdr-s:rgba(255,255,255,0.14);
+}}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--s0);color:var(--tp);font-size:14px;line-height:1.5;padding:16px}
+
+/* Page wrapper */
+.page{max-width:860px;margin:0 auto}
+
+/* Card */
+.card{background:var(--s2);border-radius:14px;border:0.5px solid var(--bdr);border-top:3px solid #FF8200;overflow:visible;margin-bottom:12px}
+.card-hdr{padding:12px 16px;border-bottom:0.5px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;color:#134564}
+.avatar{width:28px;height:28px;border-radius:50%;background:#134564;color:#ffffff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-meta{font-size:11px;color:var(--tm)}
+
+/* Section */
+.sec{padding:14px 16px;overflow:visible}
+.sec+.sec{border-top:0.5px solid var(--bdr)}
+.sec-label{font-size:10px;font-weight:700;color:#134564;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sec-mono{font-size:9px;font-weight:400;font-family:ui-monospace,monospace;text-transform:none;letter-spacing:0}
+
+/* ── TOOLTIP (desktop only) ── */
+.tip-wrap{position:relative;display:inline-block}
+.tip-trigger{cursor:help;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;text-decoration-color:rgba(19,69,100,0.25)}
+.tooltip{
+  position:absolute;bottom:calc(100% + 8px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background:var(--s2);border:1px solid var(--bdr-s);border-radius:10px;
+  padding:11px 13px;min-width:230px;max-width:270px;
+  font-size:11px;color:var(--tp);line-height:1.5;
+  z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.13);
+  pointer-events:none;opacity:0;
+  transition:opacity 0.12s,transform 0.12s;white-space:normal
+}
+.tip-wrap:hover .tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
+.tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bdr-s)}
+.tooltip.tl{left:0;transform:translateX(0) translateY(4px)}
+.tip-wrap:hover .tooltip.tl{transform:translateX(0) translateY(0)}
+.tooltip.tl::after{left:14px;transform:none}
+.tooltip.tr{left:auto;right:0;transform:translateX(0) translateY(4px)}
+.tip-wrap:hover .tooltip.tr{transform:translateX(0) translateY(0)}
+.tooltip.tr::after{left:auto;right:14px;transform:none}
+.tooltip.td{bottom:auto;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px)}
+.tip-wrap:hover .tooltip.td{transform:translateX(-50%) translateY(0)}
+.tooltip.td::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--bdr-s)}
+.tooltip.td.tl{left:0;transform:translateX(0) translateY(-4px)}
+.tip-wrap:hover .tooltip.td.tl{transform:translateX(0) translateY(0)}
+.tooltip.td.tl::after{left:14px;transform:none}
+.tooltip.td.tr{left:auto;right:0;transform:translateX(0) translateY(-4px)}
+.tip-wrap:hover .tooltip.td.tr{transform:translateX(0) translateY(0)}
+.tooltip.td.tr::after{left:auto;right:14px;transform:none}
+.t-title{font-weight:600;font-size:11px;margin-bottom:6px;padding-bottom:5px;border-bottom:0.5px solid var(--bdr)}
+.t-row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:0.5px solid var(--bdr);font-size:10px}
+.t-row:last-of-type{border-bottom:none}
+.t-lbl{color:var(--ts)}
+.t-val{font-weight:500;text-align:right}
+.t-formula{font-size:10px;color:var(--tm);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--bdr);font-family:ui-monospace,monospace;line-height:1.6}
+
+/* Hide tooltips on touch, show tap-detail instead */
+@media(hover:none){
+  .tooltip{display:none !important}
+  .tip-trigger{text-decoration:none;cursor:pointer}
+  .tap-detail{display:block !important}
+  .expand-btn{display:flex !important}
+}
+.tap-detail{display:none}
+.expand-btn{display:none;font-size:10px;color:rgba(255,255,255,0.7);margin-top:8px;cursor:pointer;align-items:center;gap:3px}
+
+/* Score hero */
+.score-hero{background:#134564;border-radius:12px;padding:16px;color:#ffffff;border-top:none}
+.score-top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.score-info{flex:1;min-width:0}
+.score-period{font-size:10px;opacity:.7;margin-bottom:2px}
+.score-val{font-size:32px;font-weight:700;line-height:1}
+.score-sub{font-size:10px;opacity:.65;margin-top:3px}
+.score-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);border-radius:5px;padding:3px 8px;font-size:10px;margin-top:6px}
+.updated-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border-radius:5px;padding:2px 7px;font-size:9px;margin-top:4px;color:rgba(255,255,255,.65)}
+.consist-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
+.consist-lbl{font-size:10px;opacity:.7}
+.consist-val{font-size:13px;font-weight:600;color:#FCD34D}
+.consist-bar-track{height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.consist-bar-fill{height:100%;border-radius:3px;background:#FF8200}
+.cal-lbl-row{display:flex;justify-content:space-between;font-size:9px;opacity:.6;margin-bottom:5px}
+.cal-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
+.cal-day{height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500}
+.cal-day.on{background:#FF8200;color:#ffffff;font-weight:700}
+.cal-day.off{background:rgba(255,255,255,.15);color:rgba(255,255,255,.35)}
+.cal-day.today{outline:2px solid #ffffff;outline-offset:-2px}
+.cal-legend{display:flex;gap:10px;margin-top:6px;justify-content:flex-end}
+.cal-leg{display:flex;align-items:center;gap:3px;font-size:9px;opacity:.65}
+.cal-leg-dot{width:8px;height:8px;border-radius:2px}
+
+/* Module grid — 4 col desktop, 2 col mobile */
+.mod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:600px){.mod-grid{grid-template-columns:1fr 1fr}}
+.mod-card{background:#134564;border-radius:var(--r);padding:12px;border:0.5px solid rgba(255,255,255,0.15);cursor:pointer;color:#ffffff}
+.mod-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mod-icon{font-size:15px;color:rgba(255,255,255,0.7)}
+.rank-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px}
+.rank-top{background:#ffffff;color:#134564}
+.rank-mid{background:#ffffff;color:#134564}
+.rank-low{background:#ffffff;color:#134564}
+.mod-score-val{font-size:24px;font-weight:700;color:#ffffff;line-height:1}
+.mod-name{font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px}
+.mod-prog-track{height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:8px 0 5px;overflow:hidden}
+.mod-prog-fill{height:100%;border-radius:2px;background:#ffffff}
+.mod-avail{font-size:10px;color:rgba(255,255,255,0.6)}
+.tap-detail{margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.2)}
+.det-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:0.5px solid rgba(255,255,255,0.15)}
+.det-row:last-of-type{border-bottom:none}
+.det-lbl{color:rgba(255,255,255,0.65)}
+.det-val{font-weight:500;color:#ffffff}
+.det-formula{font-size:10px;color:rgba(255,255,255,0.5);margin-top:6px;font-family:ui-monospace,monospace;line-height:1.5}
+
+/* Ranking section */
+.rank-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.rank-tile{background:var(--s1);border-radius:var(--r);padding:12px;text-align:center;border:0.5px solid var(--bdr)}
+.rank-tile.you{background:var(--bacc);border-color:rgba(0,87,168,0.15)}
+.rank-tile-lbl{font-size:10px;color:var(--tm);margin-bottom:3px}
+.rank-tile-val{font-size:26px;font-weight:700;line-height:1}
+.rank-tile-sub{font-size:10px;color:var(--tm);margin-top:3px}
+
+/* Comparison bars */
+.bar-legend{display:flex;gap:12px;margin-bottom:10px}
+.bar-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--tm)}
+.bar-leg-dot{width:10px;height:6px;border-radius:2px}
+.bar-section{background:var(--s1);border-radius:var(--r);padding:12px;border:0.5px solid var(--bdr);overflow:visible}
+.bar-row{display:grid;grid-template-columns:90px 1fr 36px;gap:10px;align-items:center;margin-bottom:12px;overflow:visible}
+.bar-row:last-child{margin-bottom:0}
+.bar-mod-lbl{font-size:11px;font-weight:500;display:flex;align-items:center;gap:5px}
+.bar-track{position:relative;height:20px;overflow:visible}
+.bar-avg-bg{position:absolute;top:50%;transform:translateY(-50%);left:0;height:5px;border-radius:3px;background:var(--bdr-s)}
+.bar-you-fill{position:absolute;top:50%;transform:translateY(-50%);left:0;height:9px;border-radius:3px;background:#134564;opacity:.9}
+.bar-avg-line{position:absolute;top:0;width:2px;height:20px;border-radius:1px;background:var(--ts);opacity:.4}
+.bar-score{font-size:12px;font-weight:700;color:#134564;text-align:right}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="card">
+
+  <!-- ── SECTION 1: ENGAGEMENT SCORE ── -->
+  <div class="sec">
+    <div class="sec-label">
+      Engagement Score
+      <span class="sec-mono">rolling 30 days · updated nightly</span>
+    </div>
+    <div class="score-hero">
+      <!-- Top row: arc + score + consistency stats side by side -->
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:16px;align-items:center;margin-bottom:14px">
+
+        <!-- Arc -->
+        <div class="tip-wrap" style="flex-shrink:0">
+          <div class="tip-trigger">
+            <svg width="90" height="90" viewBox="0 0 90 90" aria-label="77% engagement score">
+              <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+              <circle cx="45" cy="45" r="36" fill="none" stroke="white" stroke-width="7"
+                stroke-dasharray="174.2 226.2" stroke-dashoffset="56.5" stroke-linecap="round"/>
+              <text x="45" y="52" text-anchor="middle" font-size="19" font-weight="700" fill="white">77%</text>
+            </svg>
+          </div>
+          <div class="tooltip td tl">
+            <div class="t-title">Composite Score — 77%</div>
+            <div class="t-row"><span class="t-lbl">FranBuzz</span><span class="t-val">70%</span></div>
+            <div class="t-row"><span class="t-lbl">Top Stories</span><span class="t-val">90%</span></div>
+            <div class="t-row"><span class="t-lbl">Library</span><span class="t-val">82%</span></div>
+            <div class="t-row"><span class="t-lbl">Spaces</span><span class="t-val">75%</span></div>
+            <div class="t-row"><span class="t-lbl">Login activity</span><span class="t-val">68%</span></div>
+            <div class="t-formula">FranBuzz (70) + Top Stories (90) + Library (82) + Spaces (75) + Login (68) ÷ 5 = 77%<br>77% composite → ranked #4 of 20</div>
+          </div>
+        </div>
+
+        <!-- Score info -->
+        <div>
+          <div class="score-period">Rolling 30 days to 4 Aug 2026</div>
+          <div style="font-size:28px;font-weight:700;color:#ffffff;line-height:1;margin-top:4px">77%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px">Rank #4 of 20 · Avg 61%</div>
+          <div class="updated-pill" style="margin-top:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.65)"><i class="ti ti-refresh" style="font-size:9px" aria-hidden="true"></i> 4 Aug 2026, 2:00am</div>
+        </div>
+
+        <!-- Consistency -->
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:10px;opacity:.7">Login rank</span>
+            <div class="tip-wrap">
+              <div class="score-pill tip-trigger" style="background:#FF8200;color:#ffffff;font-weight:600;font-size:10px"><i class="ti ti-login" style="font-size:9px" aria-hidden="true"></i> #7 of 20</div>
+              <div class="tooltip td tr">
+                <div class="t-title">Login Rank — #7 of 20</div>
+                <div class="t-row"><span class="t-lbl">Active days</span><span class="t-val">10 of 30</span></div>
+                <div class="t-row"><span class="t-lbl">Current streak</span><span class="t-val">2 days</span></div>
+                <div class="t-row"><span class="t-lbl">Network avg active days</span><span class="t-val">7 of 30</span></div>
+                <div class="t-formula">Rank is based on number of days logged in compared to all other owners in your network</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:10px;opacity:.7">Active days</span>
+            <span style="font-size:13px;font-weight:600;color:#FF8200">10 of 30</span>
+          </div>
+          <div class="consist-bar-track"><div class="consist-bar-fill" style="width:33%"></div></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:10px;opacity:.7">Current streak</span>
+            <span style="font-size:13px;font-weight:600;color:#FF8200">2 days</span>
+          </div>
+          <div class="consist-bar-track"><div class="consist-bar-fill" style="width:20%"></div></div>
+        </div>
+
+      </div>
+
+      <!-- Calendar full width -->
+      <div class="cal-lbl-row"><span>6 Jul</span><span>Login activity — last 30 days</span><span>4 Aug</span></div>
+      <div class="cal-grid" id="cal"></div>
+      <div class="cal-legend">
+        <div class="cal-leg"><div class="cal-leg-dot" style="background:#FF8200"></div>Active</div>
+        <div class="cal-leg"><div class="cal-leg-dot" style="background:rgba(255,255,255,.15)"></div>Inactive</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: SCORE BY MODULE ── -->
+  <div class="sec">
+    <div class="sec-label">
+      Score by Module
+      <span class="sec-mono" id="mod-hint">hover for detail</span>
+    </div>
+    <div class="mod-grid">
+
+      <!-- FRANBUZZ -->
+      <div class="mod-card" onclick="tap('fb')">
+        <div class="mod-head">
+          <div class="mod-icon"><i class="ti ti-message-2" aria-hidden="true"></i></div>
+          <span class="rank-pill rank-mid">#6 of 20</span>
+        </div>
+        <div class="tip-wrap" style="display:block">
+          <div class="mod-score-val tip-trigger">70%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px">Rank #6 of 20</div>
+          <div class="tooltip tl">
+<div class="t-title">FranBuzz Score — 70%</div>
+            <div class="t-row"><span class="t-lbl">Reactions added</span><span class="t-val">28</span></div>
+            <div class="t-row"><span class="t-lbl">Comments created</span><span class="t-val">13</span></div>
+            <div class="t-row"><span class="t-lbl">Posts created</span><span class="t-val">12</span></div>
+            <div class="t-row"><span class="t-lbl"><strong>Total interactions</strong></span><span class="t-val"><strong>53</strong></span></div>
+            <div class="t-formula">reactions added (28) + comments created (13) + posts created (12) = 53<br>53 interactions → ranked #6 of 20</div>
+          </div>
+        </div>
+        <div class="mod-name">FranBuzz</div>
+        <div class="mod-prog-track"><div class="mod-prog-fill" style="width:70%"></div></div>
+        <div class="mod-avail">53 interactions · top 30% of network</div>
+        <div class="tap-detail" id="fb">
+          <div class="det-row"><span class="det-lbl">Reactions added</span><span class="det-val">28</span></div>
+          <div class="det-row"><span class="det-lbl">Comments created</span><span class="det-val">13</span></div>
+          <div class="det-row"><span class="det-lbl">Posts created</span><span class="det-val">12</span></div>
+          <div class="det-row"><span class="det-lbl"><strong>Total interactions</strong></span><span class="det-val"><strong>53</strong></span></div>
+          <div class="det-formula">reactions added (28) + comments created (13) + posts created (12) = 53<br>53 interactions → ranked #6 of 20</div>
+        </div>
+        <div class="expand-btn" id="fb-btn"><i class="ti ti-chevron-down" style="font-size:11px" aria-hidden="true"></i> Detail</div>
+      </div>
+
+      <!-- TOP STORIES -->
+      <div class="mod-card" onclick="tap('ts')">
+        <div class="mod-head">
+          <div class="mod-icon"><i class="ti ti-news" aria-hidden="true"></i></div>
+          <span class="rank-pill rank-top">#3 of 20</span>
+        </div>
+        <div class="tip-wrap" style="display:block">
+          <div class="mod-score-val tip-trigger">90%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px">Rank #3 of 20</div>
+          <div class="tooltip tl">
+            <div class="t-title">Top Stories Score — 90%</div>
+            <div class="t-row"><span class="t-lbl">Stories viewed</span><span class="t-val">18</span></div>
+            <div class="t-row"><span class="t-lbl">Stories published</span><span class="t-val">20</span></div>
+            <div class="t-row"><span class="t-lbl">Not yet read</span><span class="t-val">2</span></div>
+            <div class="t-row"><span class="t-lbl">Network avg read rate</span><span class="t-val">65%</span></div>
+            <div class="t-formula">stories viewed (18) ÷ stories published (20) = 90%<br>90% read rate → ranked #3 of 20</div>
+          </div>
+        </div>
+        <div class="mod-name">Top Stories</div>
+        <div class="mod-prog-track"><div class="mod-prog-fill" style="width:90%"></div></div>
+        <div class="mod-avail">18 of 20 read</div>
+        <div class="tap-detail" id="ts">
+          <div class="det-row"><span class="det-lbl">Stories viewed</span><span class="det-val">18</span></div>
+          <div class="det-row"><span class="det-lbl">Stories published</span><span class="det-val">20</span></div>
+          <div class="det-row"><span class="det-lbl">Not yet read</span><span class="det-val">2</span></div>
+          <div class="det-row"><span class="det-lbl">Network avg read rate</span><span class="det-val">65%</span></div>
+          <div class="det-formula">stories viewed (18) ÷ stories published (20) = 90%<br>90% read rate → ranked #3 of 20</div>
+        </div>
+        <div class="expand-btn" id="ts-btn"><i class="ti ti-chevron-down" style="font-size:11px" aria-hidden="true"></i> Detail</div>
+      </div>
+
+      <!-- LIBRARY -->
+      <div class="mod-card" onclick="tap('lib')">
+        <div class="mod-head">
+          <div class="mod-icon"><i class="ti ti-files" aria-hidden="true"></i></div>
+          <span class="rank-pill rank-top">#4 of 20</span>
+        </div>
+        <div class="tip-wrap" style="display:block">
+          <div class="mod-score-val tip-trigger">82%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px">Rank #4 of 20</div>
+          <div class="tooltip tl">
+            <div class="t-title">Library Score — 82%</div>
+            <div class="t-row"><span class="t-lbl">Documents viewed</span><span class="t-val">22</span></div>
+            <div class="t-row"><span class="t-lbl">Documents downloaded</span><span class="t-val">9</span></div>
+            <div class="t-row"><span class="t-lbl"><strong>Total accessed</strong></span><span class="t-val"><strong>31</strong></span></div>
+            <div class="t-row"><span class="t-lbl">Documents published</span><span class="t-val">38</span></div>
+            <div class="t-row"><span class="t-lbl">Network avg access rate</span><span class="t-val">50%</span></div>
+            <div class="t-formula">documents viewed (22) + documents downloaded (9) = 31 unique docs<br>31 accessed (38) = 82% → ranked #4 of 20</div>
+          </div>
+        </div>
+        <div class="mod-name">Library</div>
+        <div class="mod-prog-track"><div class="mod-prog-fill" style="width:82%"></div></div>
+        <div class="mod-avail">31 of 38 docs</div>
+        <div class="tap-detail" id="lib">
+          <div class="det-row"><span class="det-lbl">Documents viewed</span><span class="det-val">22</span></div>
+          <div class="det-row"><span class="det-lbl">Documents downloaded</span><span class="det-val">9</span></div>
+          <div class="det-row"><span class="det-lbl"><strong>Total accessed</strong></span><span class="det-val"><strong>31</strong></span></div>
+          <div class="det-row"><span class="det-lbl">Documents published</span><span class="det-val">38</span></div>
+          <div class="det-row"><span class="det-lbl">Network avg access rate</span><span class="det-val">50%</span></div>
+          <div class="det-formula">documents viewed (22) + documents downloaded (9) = 31 unique docs<br>31 accessed (38) = 82% → ranked #4 of 20</div>
+        </div>
+        <div class="expand-btn" id="lib-btn"><i class="ti ti-chevron-down" style="font-size:11px" aria-hidden="true"></i> Detail</div>
+      </div>
+
+      <!-- SPACES -->
+      <div class="mod-card" onclick="tap('sp')">
+        <div class="mod-head">
+          <div class="mod-icon"><i class="ti ti-layout-board" aria-hidden="true"></i></div>
+          <span class="rank-pill rank-mid">#7 of 20</span>
+        </div>
+        <div class="tip-wrap" style="display:block">
+          <div class="mod-score-val tip-trigger">75%</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px">Rank #7 of 20</div>
+          <div class="tooltip tr">
+            <div class="t-title">Spaces Score — 75%</div>
+            <div class="t-row"><span class="t-lbl">Pages viewed</span><span class="t-val">12</span></div>
+            <div class="t-row"><span class="t-lbl">Pages published</span><span class="t-val">16</span></div>
+            <div class="t-row"><span class="t-lbl">Network avg view rate</span><span class="t-val">50%</span></div>
+            <div class="t-formula">pages viewed (12) ÷ pages published (16) = 75%<br>75% view rate → ranked #7 of 20</div>
+          </div>
+        </div>
+        <div class="mod-name">Spaces</div>
+        <div class="mod-prog-track"><div class="mod-prog-fill" style="width:75%"></div></div>
+        <div class="mod-avail">12 of 16 pages</div>
+        <div class="tap-detail" id="sp">
+          <div class="det-row"><span class="det-lbl">Pages viewed</span><span class="det-val">12</span></div>
+          <div class="det-row"><span class="det-lbl">Pages published</span><span class="det-val">16</span></div>
+          <div class="det-row"><span class="det-lbl">Network avg view rate</span><span class="det-val">50%</span></div>
+          <div class="det-formula">pages viewed (12) ÷ pages published (16) = 75%<br>75% view rate → ranked #7 of 20</div>
+        </div>
+        <div class="expand-btn" id="sp-btn"><i class="ti ti-chevron-down" style="font-size:11px" aria-hidden="true"></i> Detail</div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+</div>
+</div>
+
+<script>
+// Detect touch
+const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+if(isTouch){
+  document.getElementById("mod-hint").textContent="tap for detail";
+}
+
+// Calendar
+const active=new Set([6,7,8,9,10,14,15,22,29,30]);
+const base=new Date("2026-08-04");
+const cal=document.getElementById("cal");
+for(let i=29;i>=0;i--){
+  const d=new Date(base);d.setDate(d.getDate()-i);
+  const n=30-i;
+  const div=document.createElement("div");
+  div.className=`cal-day ${active.has(n)?"on":"off"}${i===0?" today":""}`;
+  div.textContent=d.getDate();
+  cal.appendChild(div);
+}
+
+// Tap expand (mobile)
+function tap(id){
+  if(!isTouch) return;
+  const det=document.getElementById(id);
+  const btn=document.getElementById(id+"-btn");
+  if(!det||!btn) return;
+  const open=det.classList.toggle("open");
+  btn.innerHTML=open
+    ?'<i class="ti ti-chevron-up" style="font-size:11px"></i> Hide'
+    :'<i class="ti ti-chevron-down" style="font-size:11px"></i> Detail';
+}
+
+// Module comparison bars
+const MODS=[
+  {icon:"ti-message-2",label:"FranBuzz",you:70,avg:52},
+  {icon:"ti-news",label:"Top Stories",you:90,avg:65},
+  {icon:"ti-files",label:"Library",you:82,avg:50},
+  {icon:"ti-layout-board",label:"Spaces",you:75,avg:50},
+];
+document.getElementById("bars").innerHTML=MODS.map(m=>`
+  <div class="bar-row">
+    <div class="bar-mod-lbl">
+      <i class="ti ${m.icon}" style="font-size:13px;color:var(--tm)" aria-hidden="true"></i>${m.label}
+    </div>
+    <div class="bar-track">
+      <div class="bar-avg-bg" style="width:${m.avg}%"></div>
+      <div class="bar-you-fill" style="width:${m.you}%"></div>
+      <div class="bar-avg-line" style="left:${m.avg}%"></div>
+    </div>
+    <div class="bar-score">${m.you}%</div>
+  </div>
+`).join("");
+</script>
+</body>
+</html>
